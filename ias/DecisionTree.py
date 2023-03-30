@@ -16,34 +16,49 @@ def calculate_gini(Y):
             cp += 1
     return gini
 
-def find_treshold(X, Y):
-    """
-    find best treshold to split the dataset
-    """
-    best_gini = calculate_gini(Y)
-    for f in range(X[0].size): # on itere sur les features
-        for x in X:
-            l, r = [], X.copy()
-            gini = calculate_gini()
-            if gini < best_gini:
-                best_gini = gini
-                # res_f, res_t =
+    def _calculate_mean_gini(l_Y, r_Y):
+        l_gini, r_gini = calculate_gini(l_Y), calculate_gini(r_Y)
+        return (l_Y.size * l_gini + r_Y.size * r_gini) / (l_Y.size + r_Y.size)
 
-    return res_f, res_t
+    def _subset_bagging(subset_size, F):
+        return np.random.choice(np.arange(F), subset_size)
 
-import numpy as np
-from typing import type
+    def _find_treshold(X, Y, subset_size):
+        """
+        Finds best treshold to split the dataset.
+        The best (feature, treshold) is chosen between a random subset of Y.
+        """
+        X_copy = np.copy(X)
+        B = _subset_bagging(subset_size,X_copy[0].size)
+        best_gini = calculate_gini(Y)
+        res_f, res_t = B[0], X_copy[0][B[0]]
+        for f in B: # on itere sur les features d'un random subset
+            l, r = np.empty(0), np.sort(X_copy)
+            for i, x in enumerate(X_copy):
+                np.add(l, np.array(x))
+                r = r[i+1:]
+                new_gini = calculate_mean_gini(l_Y, r_Y)
+                if new_gini < best_gini:
+                    best_gini = new_gini
+                    res_f, res_t = f, r[0][f]
+        return res_f, res_t
 
-# Label = typing.
-
-
-class DecisionTree:
-    def __init__(self):
-        pass
-
-    def fit(self, x, y) -> None:
+    def fit(self, x, y, max_depth=None, splitter="gini", subset_size=None) -> None:
         """ Crée un arbre avec les données labellisées (x, y) """
-        pass
+        if max_depth == 0: # condition d'arret : max_depth atteinte
+            return
+        else:
+            if subset_size == None:
+                subset_size = np.sqrt(x[0].size)
+            if splitter == "gini":
+                f, t = _find_treshold(x, y, subset_size)
+
+            elif splitter == "random":
+                raise ValueError("random not implemented yet, stay tuned.")
+            else:
+                raise ValueError("splitter parameter must be gini or random")
+
+
 
     def predict(self, x)-> "y like":
         """ Prend des données non labellisées puis renvoi les labels estimés """

@@ -10,7 +10,8 @@
   - vary the leafs and the split to control overfitting and learning
   - balance dataset (normalizing sum of the classes' weight)
   - CART algorithm
-  - plot_tree ?
+  - plot_tree
+  - Bagging (select random subset of feature, each split)
 
 
 - RandomForest algorithm
