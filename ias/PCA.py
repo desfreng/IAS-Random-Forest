@@ -1,6 +1,11 @@
 
 class PCA:
-    def __init__(self, n_comp):
+    def __init__(self, n_composantes: float | int):
+        if isinstance(n_composantes, float):
+            pass
+        elif isinstance(n_composantes, int):
+            self._n_comp = n_composantes
+
         pass
 
     def fit(self, x) -> None:
@@ -12,4 +17,4 @@ class PCA:
     def decompress(self, y: "x reduced type") -> "x type":
         pass
 
-    
+
