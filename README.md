@@ -29,7 +29,10 @@
   - second case : correlation => single model and simultaneous prediction
   
 - CART algorithm
-  - Gini Index criterion
+  - Gini Index criterion (GI)
+    - Use row values as treshohlds
+    - iterate on every rows (sorted), calculate newGiniIndex
+    - select the best treshold as the lowest GI
 
 ===
 
@@ -40,5 +43,6 @@ Pouet pouet des liens, pouet pouet :
  - https://en.wikipedia.org/wiki/Decision_tree
  - https://towardsmachinelearning.org/decision-tree-algorithm/
  - https://www.ibm.com/topics/decision-trees
+ - https://medium.com/geekculture/decision-trees-with-cart-algorithm-7e179acee8ff
 
 >>>>>>> 9b7b9606ba066b26c2a9368e46b6be05a20d2d74
