@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 def calculate_gini(Y):
     """
@@ -55,3 +56,6 @@ class DecisionTree:
     def predict_proba(self, x) -> "proba of class x for each elm":
         """ Prend des données non labellisées puis renvoi la proba de chaque label """
         pass
+
+    def subset_size(set_size) -> int:
+        return math.sqrt(set_size)
