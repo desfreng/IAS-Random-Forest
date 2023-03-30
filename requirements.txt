@@ -1,2 +1,7 @@
 numpy
 scikit-learn
+<<<<<<< HEAD
+=======
+matplotlib
+notebook
+>>>>>>> 9b86f37 (feat: add notebook)
