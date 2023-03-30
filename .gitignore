@@ -195,3 +195,4 @@ Temporary Items
 *.vsix
 
 datasets/*
+!datasets/install_datasets.py
