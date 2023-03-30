@@ -1,5 +1,19 @@
 # IAS-Random-Forest
 
+# Pour Louis :
+
+```python
+def _get_distribution(nb_class, input_array):
+    dist = np.empty(nb_class, dtype=int)
+    
+    for cls in range(nb_class):
+        dist[cls] = np.count_nonzero(input_array == cls)
+        
+    return dist
+```
+
+# Blablabla Recherche :
+
 À explorer:
 - Decision trees
   - dimensionality reduction
@@ -21,18 +35,18 @@
 
 
 - Extremely Randomized Trees method
-  - instead of the most discriminative treshold, random treshold -> then we pick the best
+  - instead of the most discriminative threshold, random threshold -> then we pick the best
   - again decrease variance and slightly increase bias
 
 - multi-output problems (several outputs to predict instead of a single one)
-  - first case : the n outputs are independant => n independant models
+  - first case : the n outputs are independent => n independent models
   - second case : correlation => single model and simultaneous prediction
   
 - CART algorithm
   - Gini Index criterion (GI)
-    - Use row values as treshohlds
-    - iterate on every rows (sorted), calculate newGiniIndex
-    - select the best treshold as the lowest GI
+    - Use row values as thresholds
+    - iterate on every row (sorted), calculate newGiniIndex
+    - select the best threshold as the lowest GI
 
 # Ressources 
 Pouet pouet des liens, pouet pouet :
