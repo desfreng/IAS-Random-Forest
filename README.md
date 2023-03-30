@@ -30,8 +30,8 @@
   
 - CART algorithm
   - Gini Index criterion
-=======
-travail famille patrie
+
+===
 
 # Ressources 
 Pouet pouet des liens, pouet pouet :
