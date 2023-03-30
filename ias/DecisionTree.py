@@ -11,7 +11,7 @@ class DecisionTree:
         self._node_id += 1
         return self._node_id
     
-    def calculate_gini(y):
+    def calculate_gini(*y):
         """
         calculate gini index from array of class labels
         """
