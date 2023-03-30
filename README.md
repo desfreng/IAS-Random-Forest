@@ -1,6 +1,5 @@
 # IAS-Random-Forest
 
-<<<<<<< HEAD
 À explorer:
 - Decision trees
   - dimensionality reduction
@@ -35,8 +34,6 @@
     - iterate on every rows (sorted), calculate newGiniIndex
     - select the best treshold as the lowest GI
 
-===
-
 # Ressources 
 Pouet pouet des liens, pouet pouet :
 
@@ -45,5 +42,3 @@ Pouet pouet des liens, pouet pouet :
  - https://towardsmachinelearning.org/decision-tree-algorithm/
  - https://www.ibm.com/topics/decision-trees
  - https://medium.com/geekculture/decision-trees-with-cart-algorithm-7e179acee8ff
-
->>>>>>> 9b7b9606ba066b26c2a9368e46b6be05a20d2d74
