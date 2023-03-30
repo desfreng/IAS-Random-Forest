@@ -1,10 +1,9 @@
-# from ias import RandomForest
-
 import numpy as np
 
-iris_dataset = np.load("./datasets/iris.npz")
-x = iris_dataset["data"]
-y = iris_dataset["label"]
+from ias import Iris
+
+x = Iris.features
+y = Iris.labels
 
 indices = np.arange(len(x))
 np.random.shuffle(indices)
