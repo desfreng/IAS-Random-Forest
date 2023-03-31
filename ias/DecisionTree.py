@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils import calculate_gini, calculate_mean_gini, subset_bagging
+from utils import calculate_gini, calculate_mean_criterion, subset_bagging
 
 
 class DecisionTree:
@@ -30,7 +30,7 @@ class DecisionTree:
             for i, e in enumerate(x_copy):
                 np.add(l_x, e)
                 r_x = r_x[i + 1:]
-                new_gini = calculate_mean_gini(l_y, r_y)
+                new_gini = calculate_mean_criterion(l_y, r_y, calculate_gini)
                 if new_gini < best_gini:
                     best_gini = new_gini
                     res_f, res_t = f, r_x[0][f]
@@ -40,6 +40,7 @@ class DecisionTree:
         if max_depth == 0:  # condition d'arrêt : max_depth atteinte
             return
         else:
+            # todo : just adapt with the name of the splitter (only 2 cases : random or other)
             if splitter == "gini":
                 f, t, b = self._find_threshold(x, y, subset_size)
                 if (max_depth == 1) or b:  # le nœud est une feuille

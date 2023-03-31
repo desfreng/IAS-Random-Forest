@@ -24,8 +24,26 @@ def calculate_gini(y):
             cpt += 1
     return gini
 
-def calculate_mean_gini(l_y, r_y):
+def calculate_mean_criterion(l_y, r_y, index_calculator):
     """ Calculate gini index from two different subset """
-    l_gini, r_gini = calculate_gini(l_y), calculate_gini(r_y)
-    return (l_y.size * l_gini + r_y.size * r_gini) / (l_y.size + r_y.size)
+    l, r = index_calculator(l_y), index_calculator(r_y)
+    return (l_y.size * l + r_y.size * r) / (l_y.size + r_y.size)
 
+
+#################################### LOG-LOSS CRITERION ####################################
+
+def calculate_log_loss(y):
+    """
+    calculate log-loss index from array of class labels
+    """
+    log_loss, total, classes = 0, y.size, np.sort(y)
+    cpt, current = 0, classes[0]
+    for c in classes:
+        if c != current:
+            P = cpt / total
+            log_loss += P*np.log(P)
+            cpt = 1
+            current = c
+        else:
+            cpt += 1
+    return log_loss
