@@ -8,7 +8,7 @@ _iris_file = Path("../datasets/iris.npz")
 
 class Dataset:
     def __init__(self, dataset_name):
-        if dataset_name == "enmist":
+        if dataset_name == "emnist":
             self._data = self._setup_emnist()
         elif dataset_name == "iris":
             self._data = self._setup_iris()

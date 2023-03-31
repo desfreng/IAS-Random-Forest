@@ -3,7 +3,7 @@ from .DecisionTree import DecisionTree
 from .PCA import PCA
 from .RandomForest import RandomForest
 
-Enmist = Dataset("enmist")
+Emnist = Dataset("emnist")
 Iris = Dataset("iris")
 
-__all__ = ["PCA", "DecisionTree", "RandomForest", "Enmist", "Iris"]
+__all__ = ["PCA", "DecisionTree", "RandomForest", "Emnist", "Iris"]
