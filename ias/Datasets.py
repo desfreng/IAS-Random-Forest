@@ -44,3 +44,7 @@ class Dataset:
             raise RuntimeError("IRIS dataset not found. Please install it. "
                                "(see 'install_datasets' script)")
         return np.load(str(_iris_file))
+
+
+Emnist = Dataset("emnist")
+Iris = Dataset("iris")
