@@ -1,4 +1,4 @@
-import Metrics
+from . import Metrics
 from .Datasets import Dataset
 from .DecisionTree import DecisionTree
 from .PCA import PCA

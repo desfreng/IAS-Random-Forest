@@ -2,8 +2,9 @@ from pathlib import Path
 
 import numpy as np
 
-_emnist_file = Path("../datasets/emnist.npz")
-_iris_file = Path("../datasets/iris.npz")
+_dataset_dir = Path(__file__).parent.parent / "datasets"
+_emnist_file = _dataset_dir / "emnist.npz"
+_iris_file = _dataset_dir / "iris.npz"
 
 
 class Dataset:
