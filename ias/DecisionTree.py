@@ -1,5 +1,4 @@
 import numpy as np
-
 from utils import calculate_gini, calculate_mean_criterion, subset_bagging
 
 
@@ -7,11 +6,15 @@ class DecisionTree:
     def __init__(self):
         self._nodes = {}
         self._leaves = {}
-        self._node_id = 0
+        self._node_id = -1
 
     def _new_node_id(self):
         self._node_id += 1
         return self._node_id
+    
+    @property
+    def nodes(self):
+        return self._nodes
 
     def _find_threshold(self, x, y, subset_size):
         """
@@ -19,9 +22,11 @@ class DecisionTree:
         The best (feature, threshold) is chosen between a random subset of y.
         """
         x_copy = np.copy(x)
+        if len(y) == 0: # empty leaf
+            return None, None, None, True
         best_gini = calculate_gini(y)
         if best_gini == 0:  # dataset pure
-            return None, None, True
+            return best_gini, None, None, True
         bag = subset_bagging(subset_size, x_copy[0].size)
         res_f, res_t = bag[0], x_copy[0][bag[0]]
         for f in bag:  # on itère sur les features d'un random subset
@@ -34,7 +39,7 @@ class DecisionTree:
                 if new_gini < best_gini:
                     best_gini = new_gini
                     res_f, res_t = f, r_x[0][f]
-        return res_f, res_t, False
+        return best_gini, res_f, res_t, False
 
     def fit_bis(self, x, y, max_depth, splitter, subset_size, id) -> None:
         if max_depth == 0:  # condition d'arrêt : max_depth atteinte
@@ -42,17 +47,18 @@ class DecisionTree:
         else:
             # todo : just adapt with the name of the splitter (only 2 cases : random or other)
             if splitter == "gini":
-                f, t, b = self._find_threshold(x, y, subset_size)
+                g, f, t, b = self._find_threshold(x, y, subset_size)
                 if (max_depth == 1) or b:  # le nœud est une feuille
-                    self._nodes[id] = [False, x, y]
+                    _, d = np.unique(y, return_counts=True)
+                    self._nodes[id] = {"is_node": False, "gini": g, "samples": len(y), "distribution": d}
                 else:
-                    x_a = x[np.argwhere(x[:, f] < t).flatten(), :]
-                    x_b = x[np.argwhere(x[:, f] >= t).flatten(), :]
-                    y_a = np.argwhere(x[:, f] < t)  # surement faux
-                    y_b = np.argwhere(x[:, f] >= t)
+                    x_a = x[np.argwhere(x[:, f]<= t).flatten(), :]
+                    x_b = x[np.argwhere(x[:, f] > t).flatten(), :]
+                    y_a = y[np.argwhere(x[:, f]<= t).flatten()]
+                    y_b = y[np.argwhere(x[:, f] > t).flatten()]
                     id1 = self._new_node_id()
                     id2 = self._new_node_id()
-                    self._nodes[id] = [True, f, t, id1, id2]
+                    self._nodes[id] = {"is_node": True, "gini": g, "feature": f, "treshold": t, "son_1_id": id1, "son_2_id": id2}
                     self.fit_bis(x_a, y_a, max_depth - 1, splitter, subset_size, id1)
                     self.fit_bis(x_b, y_b, max_depth - 1, splitter, subset_size, id2)
 
