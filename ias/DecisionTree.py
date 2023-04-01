@@ -98,7 +98,7 @@ class DecisionTree:
         self.fit_bis(x, y, self._new_node_id(), self._max_depth)
 
     # def predict_bis(self, x, node):
-    #    if not self._nodes[node]["is_node"]: # condition d'arret : feuille
+    #    if not self._nodes[node]["is_node"]: # condition d'arrêt : feuille
     #        return 
 
     # def predict(self, x) -> "y like":

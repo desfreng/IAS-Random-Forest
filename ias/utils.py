@@ -1,28 +1,25 @@
 import numpy as np
 
 
-#################################### BAGGING ####################################
+def shrunk_proba_vector(label_list: np.ndarray) -> np.ndarray:
+    """ Return the list of probabilities of each occurring class in a random order"""
+    return np.unique(label_list, return_counts=True)[1] / len(label_list)
+
+
+# ----------------------------------- BAGGING -----------------------------------#
 
 def subset_bagging(subset_size, f):
     """ Creates a feature subset of size subset_size """
     return np.random.choice(np.arange(f), subset_size)
 
-#################################### GINI CRITERION ####################################
 
+# ----------------------------------- GINI CRITERION -----------------------------------#
 def calculate_gini(y):
     """
     calculate gini index from array of class labels
     """
-    gini, total, classes = 1, y.size, np.sort(y)
-    cpt, current = 0, classes[0]
-    for c in classes:
-        if c != current:
-            gini -= (cpt / total)**2
-            cpt = 1
-            current = c
-        else:
-            cpt += 1
-    return gini
+    return 1 - np.sum(shrunk_proba_vector(label_list=y) ** 2)
+
 
 def calculate_mean_criterion(l_y, r_y, index_calculator):
     """ Calculate gini index from two different subset """
@@ -30,20 +27,10 @@ def calculate_mean_criterion(l_y, r_y, index_calculator):
     return (l_y.size * l + r_y.size * r) / (l_y.size + r_y.size)
 
 
-#################################### LOG-LOSS CRITERION ####################################
-
+# ----------------------------------- LOG-LOSS CRITERION -----------------------------------#
 def calculate_log_loss(y):
     """
     calculate log-loss index from array of class labels
     """
-    log_loss, total, classes = 0, y.size, np.sort(y)
-    cpt, current = 0, classes[0]
-    for c in classes:
-        if c != current:
-            P = cpt / total
-            log_loss += P*np.log(P)
-            cpt = 1
-            current = c
-        else:
-            cpt += 1
-    return log_loss
+    proba_vect = shrunk_proba_vector(label_list=y)
+    return np.sum(proba_vect * np.log(proba_vect))

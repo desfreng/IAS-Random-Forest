@@ -1,6 +1,6 @@
 import numpy as np
 
-from ias import Iris
+from ias.Datasets import Iris
 
 x = Iris.features
 y = Iris.labels
