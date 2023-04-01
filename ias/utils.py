@@ -6,6 +6,19 @@ def shrunk_proba_vector(label_list: np.ndarray) -> np.ndarray:
     return np.unique(label_list, return_counts=True)[1] / len(label_list)
 
 
+def np_unique_to_proba_vector(class_list: np.ndarray,
+                              class_distribution: np.ndarray,
+                              number_of_class: int) -> np.ndarray:
+    """ Compute the vector of probabilities from the number of class present and the class
+    distribution"""
+    proba_vector = np.zeros(number_of_class)
+
+    for i in range(len(class_list)):
+        proba_vector[class_list[i]] = class_distribution[i]
+
+    return proba_vector / np.sum(class_distribution)
+
+
 # ----------------------------------- BAGGING -----------------------------------#
 
 def subset_bagging(subset_size, f):
