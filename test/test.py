@@ -1,19 +1,21 @@
 import numpy as np
 
 from ias.Datasets import Iris
+from ias.DecisionTrees.NaiveDecisionTree import NaiveDecisionTree
 
-x = Iris.features
-y = Iris.labels
-
-indices = np.arange(len(x))
+indices = np.arange(len(Iris.attributes))
 np.random.shuffle(indices)
-train_size = int(len(x) * 2 / 3)
+train_size = int(len(Iris.attributes) * 2 / 3)
 
 train_i = indices[:train_size]
-train_x = x[train_i]
-train_y = y[train_i]
+train_x = Iris.attributes[train_i]
+train_y = Iris.labels[train_i]
 
 test_i = indices[train_size:]
-test_x = x[test_i]
-test_y = y[test_i]
+test_x = Iris.attributes[test_i]
+test_y = Iris.labels[test_i]
 
+t = NaiveDecisionTree()
+t.fit(train_x, train_y)
+t.show(Iris.features_names, Iris.class_names)
+t.predict_proba(test_x)

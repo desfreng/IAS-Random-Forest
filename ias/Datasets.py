@@ -21,16 +21,20 @@ class Dataset:
         return self._data["labels"]
 
     @property
-    def features(self) -> np.ndarray:
-        return self._data["features"]
+    def attributes(self) -> np.ndarray:
+        return self._data["attributes"]
 
     @property
     def class_number(self) -> int:
         return self._data["class_number"]
 
     @property
-    def class_mapping(self) -> list[str]:
-        return list(map(str, self._data["class_mapping"]))
+    def class_names(self) -> list[str]:
+        return list(map(str, self._data["class_name"]))
+
+    @property
+    def features_names(self) -> list[str]:
+        return list(map(str, self._data["features_name"]))
 
     @staticmethod
     def _setup_emnist():

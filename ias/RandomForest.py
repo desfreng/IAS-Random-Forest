@@ -1,9 +1,10 @@
 from typing import Type
 
 import numpy as np
+from numpy import ndarray
 
 from .AbstractDecisionTree import AbstractDecisionTree
-from .utils import class_id, features, proba
+from .utils import class_id, attributes, proba
 
 
 class RandomForest:
@@ -21,7 +22,7 @@ class RandomForest:
         if not self._fitted:
             raise RuntimeError("RandomForest must be fitted")
 
-    def fit(self, data_set: np.ndarray[features], label_set: np.ndarray[class_id]) -> None:
+    def fit(self, data_set: np.ndarray[attributes], label_set: np.ndarray[class_id]) -> None:
         """ Crée des arbres avec les données labellisées (x, y) """
         indices = np.arange(len(data_set))
 
@@ -29,12 +30,12 @@ class RandomForest:
             subset_indices = np.random.choice(indices, size=self._subset_size, replace=True)
             tree.fit(data_set[subset_indices], label_set[subset_indices])
 
-    def predict(self, data_to_classify: np.ndarray[features]) -> np.ndarray[class_id]:
+    def predict(self, data_to_classify: np.ndarray[attributes]) -> ndarray[int]:
         """ Prend des données non labellisées puis renvoi les labels estimés """
         self._check_for_fit()
-        return np.argmax(self.predict_proba(data_to_classify), axis=1).reshape(-1, 1)
+        return np.argmax(self.predict_proba(data_to_classify), axis=1)
 
-    def predict_proba(self, data_to_classify: np.ndarray[features]) -> np.ndarray[proba]:
+    def predict_proba(self, data_to_classify: np.ndarray[attributes]) -> np.ndarray[proba]:
         """ Prend des données non labellisées puis renvoi la proba de chaque label """
         self._check_for_fit()
 

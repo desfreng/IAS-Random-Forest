@@ -2,7 +2,7 @@ from typing import NewType
 
 import numpy as np
 
-features = NewType("Array of feature", np.ndarray[float])
+attributes = NewType("Array of attributes", np.ndarray[float])
 proba = NewType("Probability", float)
 class_id = NewType("Id of Classes", int)
 criterion = NewType("Criterion Type", float)
@@ -19,8 +19,8 @@ def np_unique_to_proba_vector(np_unique_return, number_of_class: int) -> np.ndar
     class_list, class_distribution = np_unique_return
     proba_vector = np.zeros(number_of_class)
 
-    for i in range(len(class_list)):
-        proba_vector[class_list[i]] = class_distribution[i]
+    for i, cls_id in enumerate(class_list):
+        proba_vector[int(cls_id)] = class_distribution[i]
 
     return proba_vector / np.sum(class_distribution)
 

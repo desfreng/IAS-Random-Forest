@@ -9,7 +9,7 @@ def accuracy_score(known_labels: np.ndarray, predicted_labels: np.ndarray) -> fl
 
 def confusion_matrix(nb_class: int, known_labels: np.ndarray,
                      predicted_labels: np.ndarray) -> np.ndarray:
-    conf_matrix = np.zeros((nb_class, nb_class))
+    conf_matrix = np.zeros((nb_class, nb_class), dtype=int)
 
     for i in range(nb_class):
         prediction_of_known_i = predicted_labels[np.argwhere(known_labels == i)]

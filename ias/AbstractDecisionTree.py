@@ -2,13 +2,13 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 from graphviz import Digraph
+from numpy import ndarray
 
-from .utils import class_id, criterion, features, np_unique_to_proba_vector, proba
+from .utils import class_id, criterion, attributes, np_unique_to_proba_vector, proba
 
 
 class AbstractDecisionTree(ABC):
     def __init__(self, max_depth: int = np.inf, criterion_name: None | str = None):
-        self._vectorized_classifier = np.vectorize(self._classify)
         self._max_depth = max_depth
         self._criterion_name = criterion_name
 
@@ -41,7 +41,7 @@ class AbstractDecisionTree(ABC):
         pass
 
     @abstractmethod
-    def _find_threshold(self, data_set: np.ndarray[features], label_set: np.ndarray[class_id]) \
+    def _find_threshold(self, data_set: np.ndarray[attributes], label_set: np.ndarray[class_id]) \
             -> tuple[criterion, int, float]:
         """ Find the best feature and threshold to cut `data_set` in two non-empty parts.
 
@@ -55,7 +55,7 @@ class AbstractDecisionTree(ABC):
     def _is_label_set_pure(label_set: np.ndarray[class_id]) -> bool:
         return len(np.unique(label_set)) == 1
 
-    def _fit_bis(self, data_set: np.ndarray[features], label_set: np.ndarray[class_id],
+    def _fit_bis(self, data_set: np.ndarray[attributes], label_set: np.ndarray[class_id],
                  current_node_id: int, remaining_depth: int) -> None:
         if (remaining_depth == 1) or (self._is_label_set_pure(label_set)):
             # le nœud est une feuille
@@ -89,17 +89,17 @@ class AbstractDecisionTree(ABC):
             self._fit_bis(data_set[right_indexes, :], label_set[right_indexes], right_son_id,
                           remaining_depth - 1)
 
-    def fit(self, data_set: np.ndarray[features], label_set: np.ndarray[class_id]) -> None:
+    def fit(self, data_set: np.ndarray[attributes], label_set: np.ndarray[class_id]) -> None:
         """ Crée un arbre avec les données labellisées (x, y) """
         self._features_number = len(data_set[0])
-        self._class_number = int(np.max(label_set))
+        self._class_number = int(np.max(label_set)) + 1
 
         assert self._max_depth > 0
 
         self._fit_bis(data_set, label_set, self._new_node_id(), self._max_depth)
         self._fitted = True
 
-    def _classify(self, data_to_classify: np.ndarray[features], node_id: int) -> np.ndarray[proba]:
+    def _classify(self, elm_to_classify: attributes, node_id: int) -> np.ndarray[proba]:
         """
         Recursively classify a single element passing through nodes.
         Returns probability array
@@ -108,20 +108,20 @@ class AbstractDecisionTree(ABC):
             return self._nodes[node_id]["probability_vector"]
         else:
             f, t = self._nodes[node_id]["feature"], self._nodes[node_id]["threshold"]
-            if data_to_classify[f] <= t:
-                return self._classify(data_to_classify, self._nodes[node_id]["left_son_id"])
+            if elm_to_classify[f] <= t:
+                return self._classify(elm_to_classify, self._nodes[node_id]["left_son_id"])
             else:
-                return self._classify(data_to_classify, self._nodes[node_id]["right_son_id"])
+                return self._classify(elm_to_classify, self._nodes[node_id]["right_son_id"])
 
-    def predict_proba(self, data_to_classify: np.ndarray[features]) -> np.ndarray[proba]:
+    def predict_proba(self, data_to_classify: np.ndarray[attributes]) -> np.ndarray[proba]:
         """ Prend des données non labellisées puis renvoi la proba de chaque label """
         self._check_for_fit()
-        return self._vectorized_classifier(data_to_classify)
+        return np.apply_along_axis(self._classify, 1, data_to_classify, 0)
 
-    def predict(self, data_to_classify: np.ndarray[features]) -> np.ndarray[class_id]:
+    def predict(self, data_to_classify: np.ndarray[attributes]) -> ndarray[int]:
         """ Prend des données non labellisées puis renvoi les labels estimés """
         self._check_for_fit()
-        return np.argmax(self.predict_proba(data_to_classify), axis=1).reshape(-1, 1)
+        return np.argmax(self.predict_proba(data_to_classify), axis=1)
 
     @abstractmethod
     def show(self, features_names: list[str] = None, class_name: list[str] = None) -> Digraph:
@@ -130,32 +130,32 @@ class AbstractDecisionTree(ABC):
     def _abstract_show(self, show_criterion: bool, features_names: list[str] = None,
                        class_name: list[str] = None) -> Digraph:
         """ Affiche le Tree (Utilisable dans Jupyter Notebook)"""
-        if self._fitted:
+        if not self._fitted:
             return Digraph()
 
         if features_names is None:
-            features_names = list(map(str, range(self._features_number)))
+            features_names = list(map(lambda i: f"Feature {i + 1}", range(self._features_number)))
 
         if class_name is None:
-            features_names = list(map(str, range(self._class_number)))
+            class_name = list(map(lambda i: f"Class {i}", range(self._class_number)))
 
         splitting_node_args = {"shape": "ellipse"}
         leaf_args = {"shape": "rectangle", "style": "rounded"}
 
         dot_tree = Digraph()
         for node_id, node_data in self._nodes.items():
-            criterion_value = node_data["criterion"]
+            criterion_value = np.round(node_data["criterion"], 2)
             samples = node_data["samples"]
 
             if node_data["is_node"]:
                 feature_name = features_names[node_data["feature"]]
-                threshold = node_data["threshold"]
+                threshold = np.round(node_data["threshold"], 2)
 
                 node_str = f"{feature_name} ≤ {threshold}\n"
                 if show_criterion:
                     node_str += f"{self._criterion_name} = {criterion_value}\n"
 
-                node_str = f"Samples = {samples}"
+                node_str += f"Samples = {samples}"
                 node_args = splitting_node_args
 
             else:
@@ -168,7 +168,7 @@ class AbstractDecisionTree(ABC):
                     node_str = ""
 
                 node_str += f"Samples = {samples}\n" \
-                            f"Probabilities : {proba_vector}\n" \
+                            f"Probabilities : {np.round(proba_vector, 2)}\n" \
                             f"Majority Class = {majority_class}"
                 node_args = leaf_args
 

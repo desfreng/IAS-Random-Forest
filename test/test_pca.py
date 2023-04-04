@@ -36,7 +36,7 @@ def test_n_composantes():
 
 
 def test_with_iris():
-    data = Iris.features
+    data = Iris.attributes
 
     pca1 = PCA(n_composantes=0.9)
     pca2 = PCA(n_composantes=0.95)
@@ -61,7 +61,7 @@ def test_with_iris():
 
 
 def test_with_emnist():
-    data = Emnist.features[:1000]
+    data = Emnist.attributes[:1000]
     var_1 = 0.8
     var_2 = 0.95
 
@@ -98,5 +98,5 @@ def test_with_emnist():
     ax[2].imshow(decompressed2[img_nb].reshape(28, 28).T)
     ax[2].set_title(f"{int(var_2 * 100)}% of variance")
 
-    print("Label : ", Emnist.class_mapping[Emnist.labels[img_nb]])
+    print("Label : ", Emnist.class_names[Emnist.labels[img_nb]])
     plt.show()

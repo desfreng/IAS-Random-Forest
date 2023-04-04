@@ -16,6 +16,8 @@ _iris_file = Path("./iris.npz")
 def install_iris():
     tmp_dir = TemporaryDirectory()
     class_mapping = ["Iris-setosa", "Iris-versicolor", "Iris-virginica"]
+    features_mapping = ["sepal length in cm", "sepal width in cm", "petal length in cm",
+                        "petal width in cm"]
 
     print("Installing IRIS... ")
     iris_data = requests.get(IRIS_URL).content.decode()
@@ -34,8 +36,9 @@ def install_iris():
     data = np.genfromtxt(downloaded_file, delimiter=",")
     features_data, label = data[:, :-1], data[:, -1]
 
-    np.savez_compressed(_iris_file, labels=label, features=features_data,
-                        class_number=nb_class, class_mapping=class_mapping)
+    np.savez_compressed(_iris_file, labels=label, attributes=features_data,
+                        class_number=nb_class, class_name=class_mapping,
+                        features_name=features_mapping)
     print("Done.")
 
 
@@ -53,7 +56,6 @@ def install_emnist():
         tmp_mat = tmp_zip.extract("matlab/emnist-digits.mat", tmp_dir.name)
 
     print("Extracting Data...")
-    nb_class = 10  # Number of class
 
     digits_data = loadmat(tmp_mat)['dataset'][0][0]
     train, test, _ = digits_data
@@ -62,8 +64,12 @@ def install_emnist():
     train_img, train_label, train_writer_id = train
     train_label = train_label[:, 0]
 
-    np.savez_compressed(_emnist_file, labels=train_label, features=train_img,
-                        class_number=nb_class, class_mapping=list(map(str, range(nb_class))))
+    nb_class = 10  # Number of class
+    nb_features = len(train_img[0])
+
+    np.savez_compressed(_emnist_file, labels=train_label, attributes=train_img,
+                        class_number=nb_class, class_name=list(map(str, range(nb_class))),
+                        features_name=list(map(str, range(nb_features))))
     print("Done.")
 
 

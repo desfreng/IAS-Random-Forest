@@ -2,15 +2,22 @@ import numpy as np
 from graphviz import Digraph
 
 from ..AbstractDecisionTree import AbstractDecisionTree
-from ..utils import calculate_mean_criterion, criterion, subset_bagging, calculate_gini, calculate_log_loss
+from ..utils import calculate_gini, calculate_log_loss, calculate_mean_criterion, class_id, \
+    criterion, subset_bagging
 
 
-class DecisionTree(AbstractDecisionTree):
+class CartDecisionTree(AbstractDecisionTree):
     def __init__(self, max_depth=np.inf, subset_size: int | None = None,
                  criterion_name: str = "gini"):
         super().__init__(max_depth, "gini")
         self._subset_size = subset_size
-        self.compute_criterion = calculate_gini if criterion_name == "gini" else calculate_log_loss
+        self._criterion_name = criterion_name
+
+    def compute_criterion(self, label_set: np.ndarray[class_id]) -> criterion:
+        if self._criterion_name == "gini":
+            return calculate_gini(label_set)
+        else:
+            return calculate_log_loss(label_set)
 
     def _find_threshold(self, data_set, label_set) -> tuple[criterion, int, float]:
         """
@@ -30,7 +37,8 @@ class DecisionTree(AbstractDecisionTree):
         res_f, res_t = bag[0], data_set[0][bag[0]]
         r_x = np.empty(0)
         for f in bag:  # on itère sur les features d'un random subset
-            l_x, r_x = np.empty(data_set.shape), data_set[data_set[:, f].argsort()]
+            r_x = data_set[data_set[:, f].argsort()]
+            l_x = np.empty(data_set.shape)
             l_y, r_y = np.empty(label_set.shape), label_set[data_set[:, f].argsort()]
             for i, e in enumerate(data_set):
                 np.add(l_x, e)
@@ -40,7 +48,9 @@ class DecisionTree(AbstractDecisionTree):
                     best_criterion = new_crit
                     res_f, res_t = f, r_x[0][f]
         if r_x.size == 0:
-            return self._find_threshold(data_set, label_set)
+            print(data_set)
+            raise FileExistsError
+            # return self._find_threshold(data_set, label_set)
 
         return best_criterion, res_f, res_t
 
