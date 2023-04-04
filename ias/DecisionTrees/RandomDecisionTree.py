@@ -71,18 +71,5 @@ class RandomDecisionTree(AbstractDecisionTree):
 
         return best_criterion, best_feature, best_threshold
 
-        # res_f, res_t = 0, thresholds[0]
-        # for f, t in enumerate(thresholds):  # on itère sur les thresholds tirés au hasard
-        #     left_labels = label_set[np.argwhere(data_set[:, f] <= t)]
-        #     right_labels = label_set[np.argwhere(data_set[:, f] > t)]
-        #     new_crit = calculate_mean_criterion(left_labels, right_labels, self.compute_criterion)
-        #     if new_crit < best_criterion:
-        #         best_criterion = new_crit
-        #         res_f, res_t = f, t
-        #
-        # if right_labels.size == 0 or left_labels.size == 0:
-        #     return self._find_threshold(data_set, label_set)
-        # return best_criterion, res_f, res_t
-
     def show(self, features_names=None, class_name=None) -> Digraph:
         return self._abstract_show(True, features_names, class_name)

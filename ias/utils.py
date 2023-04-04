@@ -26,7 +26,8 @@ def np_unique_to_proba_vector(np_unique_return, number_of_class: int) -> np.ndar
 
 
 def random(minimum, maximum):
-    return (np.random.rand()*0.98+0.01) * (maximum - minimum) + minimum
+    return (np.random.rand() * 0.98 + 0.01) * (maximum - minimum) + minimum
+
 
 # ----------------------------------- BAGGING -----------------------------------#
 

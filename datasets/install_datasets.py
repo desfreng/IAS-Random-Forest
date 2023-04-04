@@ -6,7 +6,7 @@ import numpy as np
 import requests
 from scipy.io import loadmat
 
-EMNIST_URL = "http://www.itl.nist.gov/iaui/vip/cs_links/EMNIST/matlab.zip"
+EMNIST_URL = "https://www.itl.nist.gov/iaui/vip/cs_links/EMNIST/matlab.zip"
 IRIS_URL = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
 
 _emnist_file = Path("./emnist.npz")
