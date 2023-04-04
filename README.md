@@ -1,56 +1,39 @@
-# IAS-Random-Forest
+# Rapport IAS-Random-Forest
 
-# Pour Louis :
+## Sur quoi nous avons travaillé :
 
-```python
-def _get_distribution(nb_class, input_array):
-    dist = np.empty(nb_class, dtype=int)
-    
-    for cls in range(nb_class):
-        dist[cls] = np.count_nonzero(input_array == cls)
-        
-    return dist
-```
+Nous avons travaillé sur une implémentation de l'algorithme de classification Random Forest.
+Notre travail met en oeuvre chacune des étapes de la classification.
+En effet, une première partie de notre travail porte sur le prétraitement des données.
+Il fallait, pour pouvoir tester notre travail sur de vrais dataset, être capable de réduire en dimension les attributs.
+Nous avons alors implémenté la PCA, avec chacune de ces étapes (à détailler Gaby).
+Ensuite vient le coeur du programme, le Random Forest Classifier.
+L'algorithme se base sur le Decision Tree Classifier, avec quelques variantes.
+Nous avons donc implémenter l'algoritme CART ainsi qu'une version naïve pour pouvoir les comparer.
+Nous avons voulu aller plus loin en implémentant l'algorithme "Extremely Randomized Tree" (pas sur que ce soit le vrai nom lol)
+qui nécessite l'implémentation d'une version modifié du Decision Tree Classifier.
+Enfin, pour pouvoir comparer et tester nos algorithmes (entre eux ainsi que face aux versions de sklearn)
+nous avons utilisé les dataset "Iris" et "eMNIST".
+Pour pouvoir mieux visualiser les résultats nous avons aussi travaillé sur un module de graphes
+qui permet l'observation et l'exportation des beaux arbres créés !
 
-# Blablabla Recherche :
+(petit paragraphe sur la structure du code ?)
 
-À explorer:
-- Decision trees
-  - dimensionality reduction
-    - PCA
-    - Feature selection
-  - tree depth depends on number of sample (x2 each add level)
-  - vary the leafs and the split to control overfitting and learning
-  - balance dataset (normalizing sum of the classes' weight)
-  - CART algorithm
-  - plot_tree
-  - Bagging (select random subset of feature, each split)
+## Les algorithmes que nous avons implémenté :
 
+PCA, pourquoi, les avantages et inconvénients, description du travail (options etc...)
 
-- RandomForest algorithm
-  - each tree from a bootstrap sample (of training set)
-  - best split : all features / random subset of features
-  - randomness to decrease variance of the estimator
-  - slight increase bias
+Decision Tree, pourquoi, les avantages et inconvénients, description du travail (options etc...)
 
+Random Forest, les avantages et inconvénients, description du travail (options etc...)
 
-- Extremely Randomized Trees method
-  - instead of the most discriminative threshold, random threshold -> then we pick the best
-  - again decrease variance and slightly increase bias
+## L'heure des test sur des vrais datasets !
 
-- multi-output problems (several outputs to predict instead of a single one)
-  - first case : the n outputs are independent => n independent models
-  - second case : correlation => single model and simultaneous prediction
-  
-- CART algorithm
-  - Gini Index criterion (GI)
-    - Use row values as thresholds
-    - iterate on every row (sorted), calculate newGiniIndex
-    - select the best threshold as the lowest GI
+## Nos conclusions sur notre travail et des pistes futures :
 
-# Ressources 
-Pouet pouet des liens, pouet pouet :
+## Ressources (on garde ?)
 
+Nous nous sommes basé sur la structure de sklearn et leur doc nous a grandement aidé.
  - https://scikit-learn.org/stable/modules/tree.html
  - https://en.wikipedia.org/wiki/Decision_tree
  - https://towardsmachinelearning.org/decision-tree-algorithm/
