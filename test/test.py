@@ -1,7 +1,7 @@
 import numpy as np
 
 from ias.Datasets import Iris
-from ias.DecisionTrees.NaiveDecisionTree import NaiveDecisionTree
+from ias.DecisionTrees.CartDecisionTree import CartDecisionTree
 
 indices = np.arange(len(Iris.attributes))
 np.random.shuffle(indices)
@@ -15,7 +15,7 @@ test_i = indices[train_size:]
 test_x = Iris.attributes[test_i]
 test_y = Iris.labels[test_i]
 
-t = NaiveDecisionTree()
+t = CartDecisionTree()
 t.fit(train_x, train_y)
 t.show(Iris.features_names, Iris.class_names)
 t.predict_proba(test_x)

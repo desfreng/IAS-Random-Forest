@@ -27,32 +27,36 @@ class CartDecisionTree(AbstractDecisionTree):
         :param label_set: the label_set
         :return: tuple containing (the best criterion value, feature number, threshold value)
         """
-        best_criterion = 2
+        best_criterion = None
+        best_feature = None
+        best_threshold = None
 
         if self._subset_size is None:
             bag = subset_bagging(int(np.sqrt(self.features_number)), self.features_number)
         else:
             bag = subset_bagging(self._subset_size, self.features_number)
 
-        res_f, res_t = bag[0], data_set[0][bag[0]]
-        r_x = np.empty(0)
-        for f in bag:  # on itère sur les features d'un random subset
-            r_x = data_set[data_set[:, f].argsort()]
-            l_x = np.empty(data_set.shape)
-            l_y, r_y = np.empty(label_set.shape), label_set[data_set[:, f].argsort()]
-            for i, e in enumerate(data_set):
-                np.add(l_x, e)
-                r_x = r_x[i + 1:]
-                new_crit = calculate_mean_criterion(l_y, r_y, self.compute_criterion)
-                if new_crit < best_criterion:
-                    best_criterion = new_crit
-                    res_f, res_t = f, r_x[0][f]
-        if r_x.size == 0:
-            print(data_set)
-            raise FileExistsError
-            # return self._find_threshold(data_set, label_set)
+        for feature in bag:
+            feature_data = data_set[:, feature].flatten()
+            for threshold in feature_data:
+                left_indexes = np.argwhere(feature_data <= threshold)
+                right_indexes = np.argwhere(feature_data > threshold)
 
-        return best_criterion, res_f, res_t
+                current_criterion = calculate_mean_criterion(label_set[left_indexes],
+                                                             label_set[right_indexes],
+                                                             self.compute_criterion)
+                
+                if (best_criterion is None or current_criterion < best_criterion) \
+                        and len(left_indexes) > 0 \
+                        and len(right_indexes) > 0:
+                    best_criterion = current_criterion
+                    best_feature = feature
+                    best_threshold = threshold
+
+            if best_criterion is None:
+                return self._find_threshold(data_set, label_set)
+
+        return best_criterion, best_feature, best_threshold
 
     def show(self, features_names=None, class_name=None) -> Digraph:
         return self._abstract_show(True, features_names, class_name)

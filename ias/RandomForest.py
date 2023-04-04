@@ -4,7 +4,7 @@ import numpy as np
 from numpy import ndarray
 
 from .AbstractDecisionTree import AbstractDecisionTree
-from .utils import class_id, attributes, proba
+from .utils import attributes, class_id, proba
 
 
 class RandomForest:
@@ -30,6 +30,8 @@ class RandomForest:
             subset_indices = np.random.choice(indices, size=self._subset_size, replace=True)
             tree.fit(data_set[subset_indices], label_set[subset_indices])
 
+        self._fitted = True
+
     def predict(self, data_to_classify: np.ndarray[attributes]) -> ndarray[int]:
         """ Prend des données non labellisées puis renvoi les labels estimés """
         self._check_for_fit()
@@ -41,9 +43,10 @@ class RandomForest:
 
         proba_sum = None
         for tree in self._trees:
-            if proba_sum:
-                proba_sum += tree.predict_proba(data_to_classify)
-            else:
+            if proba_sum is None:
                 proba_sum = tree.predict_proba(data_to_classify)
+            else:
+                proba_sum += tree.predict_proba(data_to_classify)
+                
         proba_sum /= len(self._trees)
         return proba_sum
