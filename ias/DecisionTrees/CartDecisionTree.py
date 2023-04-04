@@ -17,7 +17,7 @@ class DecisionTree(AbstractDecisionTree):
         """
         # TODO : Check this method with refactoring...
         x_copy = np.copy(data_set)
-        best_gini = self.compute_criterion(data_set, label_set)
+        best_gini = self.compute_criterion(label_set)
 
         if self._subset_size is None:
             bag = subset_bagging(int(np.sqrt(self.features_number)), self.features_number)
@@ -39,7 +39,7 @@ class DecisionTree(AbstractDecisionTree):
 
         return best_gini, res_f, res_t
 
-    def compute_criterion(self, data_set: np.ndarray, label_set: np.ndarray) -> float:
+    def compute_criterion(self, label_set: np.ndarray) -> float:
         """
         calculate gini index from array of class labels
         """

@@ -1,15 +1,17 @@
+from typing import Type
+
 import numpy
 
-from . import AbstractDecisionTree
+from .AbstractDecisionTree import AbstractDecisionTree
 
 
 class RandomForest:
-    def __init__(self, trees_number, subset_size, **args):
+    def __init__(self, tree_class: Type[AbstractDecisionTree], trees_number, subset_size, **args):
         self._subset_size = subset_size
         self._trees = []
 
         for _ in range(trees_number):
-            self._trees.append(DecisionTree(**args))
+            self._trees.append(tree_class(**args))
 
         self._fitted = False
 

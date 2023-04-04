@@ -36,7 +36,7 @@ class AbstractDecisionTree(ABC):
         return self._node_id
 
     @abstractmethod
-    def compute_criterion(self, data_set: np.ndarray, label_set: np.ndarray) -> float:
+    def compute_criterion(self, label_set: np.ndarray) -> float:
         pass
 
     @abstractmethod
@@ -59,7 +59,7 @@ class AbstractDecisionTree(ABC):
                 "is_node": False,
                 "probability_vector": probability_vector,
                 "samples": len(label_set),
-                "criterion": self.compute_criterion(data_set, label_set)
+                "criterion": self.compute_criterion(label_set)
             }
         else:
             criterion_value, selected_feature, threshold = self._find_threshold(data_set, label_set)
