@@ -33,6 +33,7 @@ def subset_bagging(subset_size, f):
 
 
 # ----------------------------------- GINI CRITERION -----------------------------------#
+
 def calculate_gini(y):
     """
     calculate gini index from array of class labels
@@ -52,4 +53,4 @@ def calculate_log_loss(y):
     calculate log-loss index from array of class labels
     """
     proba_vect = shrunk_proba_vector(label_list=y)
-    return np.sum(proba_vect * np.log(proba_vect))
+    return np.sum(-proba_vect * np.log(proba_vect))

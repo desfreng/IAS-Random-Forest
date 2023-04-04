@@ -2,7 +2,7 @@ import numpy as np
 from graphviz import Digraph
 
 from ..AbstractDecisionTree import AbstractDecisionTree
-from ..utils import calculate_mean_criterion, criterion, shrunk_proba_vector, subset_bagging
+from ..utils import calculate_mean_criterion, criterion, subset_bagging, calculate_gini, calculate_log_loss
 
 
 class DecisionTree(AbstractDecisionTree):
@@ -10,7 +10,7 @@ class DecisionTree(AbstractDecisionTree):
                  criterion_name: str = "gini"):
         super().__init__(max_depth, "gini")
         self._subset_size = subset_size
-        self._criterion_name = criterion_name
+        self.compute_criterion = calculate_gini if criterion_name == "gini" else calculate_log_loss
 
     def _find_threshold(self, data_set, label_set) -> tuple[criterion, int, float]:
         """
@@ -35,20 +35,14 @@ class DecisionTree(AbstractDecisionTree):
             for i, e in enumerate(data_set):
                 np.add(l_x, e)
                 r_x = r_x[i + 1:]
-                new_gini = calculate_mean_criterion(l_y, r_y, self.compute_criterion)
-                if new_gini < best_criterion:
-                    best_criterion = new_gini
+                new_crit = calculate_mean_criterion(l_y, r_y, self.compute_criterion)
+                if new_crit < best_criterion:
+                    best_criterion = new_crit
                     res_f, res_t = f, r_x[0][f]
         if r_x.size == 0:
             return self._find_threshold(data_set, label_set)
 
         return best_criterion, res_f, res_t
-
-    def compute_criterion(self, label_set: np.ndarray) -> float:
-        """
-        calculate gini index from array of class labels
-        """
-        return 1 - np.sum(shrunk_proba_vector(label_list=label_set) ** 2)
 
     def show(self, features_names=None, class_name=None) -> Digraph:
         return self._abstract_show(True, features_names, class_name)
