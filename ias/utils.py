@@ -25,6 +25,9 @@ def np_unique_to_proba_vector(np_unique_return, number_of_class: int) -> np.ndar
     return proba_vector / np.sum(class_distribution)
 
 
+def random(minimum, maximum):
+    return (np.random.rand()*0.98+0.01) * (maximum - minimum) + minimum
+
 # ----------------------------------- BAGGING -----------------------------------#
 
 def subset_bagging(subset_size, f):
