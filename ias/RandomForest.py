@@ -1,6 +1,6 @@
 import numpy
 
-from . import DecisionTree
+from . import AbstractDecisionTree
 
 
 class RandomForest:
