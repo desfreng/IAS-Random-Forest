@@ -46,7 +46,8 @@ class RandomDecisionTree(AbstractDecisionTree):
         print("Begin !")
         print(thresholds)
 
-        for feature, threshold in enumerate(thresholds):
+        for f_id, threshold in enumerate(thresholds):
+            feature = bag[f_id]
             feature_data = data_set[:, feature].flatten()
             left_indexes = np.argwhere(feature_data <= threshold)
             right_indexes = np.argwhere(feature_data > threshold)
