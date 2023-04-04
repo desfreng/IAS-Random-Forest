@@ -13,8 +13,7 @@ train_i = indices[:train_size]
 train_x = x[train_i]
 train_y = y[train_i]
 
-check_i = indices[train_size:]
-check_x = x[check_i]
-check_y = y[check_i]
+test_i = indices[train_size:]
+test_x = x[test_i]
+test_y = y[test_i]
 
-# forest.fit(x, y, 250, 50)

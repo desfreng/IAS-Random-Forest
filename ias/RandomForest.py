@@ -1,46 +1,48 @@
 from typing import Type
 
-import numpy
+import numpy as np
 
 from .AbstractDecisionTree import AbstractDecisionTree
+from .utils import class_id, features, proba
 
 
 class RandomForest:
-    def __init__(self, tree_class: Type[AbstractDecisionTree], trees_number, subset_size, **args):
+    def __init__(self, tree_class: Type[AbstractDecisionTree], tree_number: int,
+                 subset_size: int, **args):
         self._subset_size = subset_size
         self._trees = []
 
-        for _ in range(trees_number):
+        for _ in range(tree_number):
             self._trees.append(tree_class(**args))
 
         self._fitted = False
 
-    def _check_for_fit(self):
+    def _check_for_fit(self) -> None:
         if not self._fitted:
             raise RuntimeError("RandomForest must be fitted")
 
-    def fit(self, x, y) -> None:
+    def fit(self, data_set: np.ndarray[features], label_set: np.ndarray[class_id]) -> None:
         """ Crée des arbres avec les données labellisées (x, y) """
-        indices = numpy.arange(len(x))
+        indices = np.arange(len(data_set))
 
         for tree in self._trees:
-            subset_indices = numpy.random.choice(indices, size=self._subset_size, replace=True)
-            tree.fit(x[subset_indices], y[subset_indices])
+            subset_indices = np.random.choice(indices, size=self._subset_size, replace=True)
+            tree.fit(data_set[subset_indices], label_set[subset_indices])
 
-    def predict(self, x) -> "y like":
+    def predict(self, data_to_classify: np.ndarray[features]) -> np.ndarray[class_id]:
         """ Prend des données non labellisées puis renvoi les labels estimés """
         self._check_for_fit()
-        return numpy.argmax(self.predict_proba(x), axis=1).reshape(-1, 1)
+        return np.argmax(self.predict_proba(data_to_classify), axis=1).reshape(-1, 1)
 
-    def predict_proba(self, x) -> "proba of class x for each elm":
+    def predict_proba(self, data_to_classify: np.ndarray[features]) -> np.ndarray[proba]:
         """ Prend des données non labellisées puis renvoi la proba de chaque label """
         self._check_for_fit()
 
         proba_sum = None
         for tree in self._trees:
             if proba_sum:
-                proba_sum += tree.predict_proba(x)
+                proba_sum += tree.predict_proba(data_to_classify)
             else:
-                proba_sum = tree.predict_proba(x)
+                proba_sum = tree.predict_proba(data_to_classify)
         proba_sum /= len(self._trees)
         return proba_sum

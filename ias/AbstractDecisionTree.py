@@ -3,11 +3,12 @@ from abc import ABC, abstractmethod
 import numpy as np
 from graphviz import Digraph
 
-from .utils import np_unique_to_proba_vector
+from .utils import class_id, criterion, features, np_unique_to_proba_vector, proba
 
 
 class AbstractDecisionTree(ABC):
-    def __init__(self, max_depth=np.inf, criterion_name: None | str = None):
+    def __init__(self, max_depth: int = np.inf, criterion_name: None | str = None):
+        self._vectorized_classifier = np.vectorize(self._classify)
         self._max_depth = max_depth
         self._criterion_name = criterion_name
 
@@ -16,8 +17,8 @@ class AbstractDecisionTree(ABC):
         self._nodes = {}
         self._node_id = -1
 
-        self._features_number = None
-        self._class_number = None
+        self._features_number: None | int = None
+        self._class_number: None | int = None
 
     @property
     def features_number(self) -> int:
@@ -36,24 +37,30 @@ class AbstractDecisionTree(ABC):
         return self._node_id
 
     @abstractmethod
-    def compute_criterion(self, label_set: np.ndarray) -> float:
+    def compute_criterion(self, label_set: np.ndarray[class_id]) -> criterion:
         pass
 
     @abstractmethod
-    def _find_threshold(self, data_set: np.ndarray, label_set: np.ndarray) \
-            -> tuple[float, int, int]:
+    def _find_threshold(self, data_set: np.ndarray[features], label_set: np.ndarray[class_id]) \
+            -> tuple[criterion, int, float]:
+        """ Find the best feature and threshold to cut `data_set` in two non-empty parts.
+
+        :param data_set: Array of Features
+        :param label_set:
+        :return: a tuple with criterion, the feature's id and the threshold value
+        """
         pass
 
     @staticmethod
-    def _is_label_set_pure(label_set: np.ndarray) -> bool:
+    def _is_label_set_pure(label_set: np.ndarray[class_id]) -> bool:
         return len(np.unique(label_set)) == 1
 
-    def fit_bis(self, data_set: np.ndarray, label_set: np.ndarray, current_node_id: int,
-                remaining_depth: int) -> None:
+    def _fit_bis(self, data_set: np.ndarray[features], label_set: np.ndarray[class_id],
+                 current_node_id: int, remaining_depth: int) -> None:
         if (remaining_depth == 1) or (self._is_label_set_pure(label_set)):
             # le nœud est une feuille
-            probability_vector = np_unique_to_proba_vector(
-                *np.unique(label_set, return_counts=True), self._class_number)
+            probability_vector = np_unique_to_proba_vector(np.unique(label_set, return_counts=True),
+                                                           self._class_number)
 
             self._nodes[current_node_id] = {
                 "is_node": False,
@@ -77,41 +84,41 @@ class AbstractDecisionTree(ABC):
                                             "right_son_id": right_son_id,
                                             "samples": len(label_set)}
 
-            self.fit_bis(data_set[left_indexes, :], label_set[left_indexes, :], left_son_id,
-                         remaining_depth - 1)
-            self.fit_bis(data_set[right_indexes, :], label_set[right_indexes, :], right_son_id,
-                         remaining_depth - 1)
+            self._fit_bis(data_set[left_indexes, :], label_set[left_indexes], left_son_id,
+                          remaining_depth - 1)
+            self._fit_bis(data_set[right_indexes, :], label_set[right_indexes], right_son_id,
+                          remaining_depth - 1)
 
-    def fit(self, data_set: np.ndarray, label_set: np.ndarray) -> None:
+    def fit(self, data_set: np.ndarray[features], label_set: np.ndarray[class_id]) -> None:
         """ Crée un arbre avec les données labellisées (x, y) """
         self._features_number = len(data_set[0])
-        self._class_number = np.max(label_set)
+        self._class_number = int(np.max(label_set))
 
         assert self._max_depth > 0
 
-        self.fit_bis(data_set, label_set, self._new_node_id(), self._max_depth)
+        self._fit_bis(data_set, label_set, self._new_node_id(), self._max_depth)
         self._fitted = True
 
-    def classify(self, data_to_classify, node_id):
+    def _classify(self, data_to_classify: np.ndarray[features], node_id: int) -> np.ndarray[proba]:
         """
         Recursively classify a single element passing through nodes.
         Returns probability array
         """
-        if not self.nodes[node_id]["is_node"]: # condition d'arret : feuille
-            return self.nodes[node_id]["probability_vector"]
+        if not self._nodes[node_id]["is_node"]:  # condition d'arrêt : feuille
+            return self._nodes[node_id]["probability_vector"]
         else:
-            f, t = self.nodes[node_id]["feature"], self.nodes[node_id]["treshold"]
+            f, t = self._nodes[node_id]["feature"], self._nodes[node_id]["threshold"]
             if data_to_classify[f] <= t:
-                return self.classify(data_to_classify, self.nodes[node_id]["left_son_id"])
-            return self.classify(data_to_classify, self.nodes[node_id]["right_son_id"])
+                return self._classify(data_to_classify, self._nodes[node_id]["left_son_id"])
+            else:
+                return self._classify(data_to_classify, self._nodes[node_id]["right_son_id"])
 
-    def predict_proba(self, data_to_classify: np.ndarray) -> np.ndarray:
+    def predict_proba(self, data_to_classify: np.ndarray[features]) -> np.ndarray[proba]:
         """ Prend des données non labellisées puis renvoi la proba de chaque label """
         self._check_for_fit()
-        self._vectorized_classifier = np.vectorize(self.classify)
         return self._vectorized_classifier(data_to_classify)
 
-    def predict(self, data_to_classify: np.ndarray) -> np.ndarray:
+    def predict(self, data_to_classify: np.ndarray[features]) -> np.ndarray[class_id]:
         """ Prend des données non labellisées puis renvoi les labels estimés """
         self._check_for_fit()
         return np.argmax(self.predict_proba(data_to_classify), axis=1).reshape(-1, 1)

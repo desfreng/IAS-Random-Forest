@@ -2,7 +2,7 @@ import numpy as np
 from graphviz import Digraph
 
 from ..AbstractDecisionTree import AbstractDecisionTree
-from ..utils import calculate_mean_criterion, shrunk_proba_vector, subset_bagging
+from ..utils import calculate_mean_criterion, criterion, shrunk_proba_vector, subset_bagging
 
 
 class DecisionTree(AbstractDecisionTree):
@@ -10,7 +10,7 @@ class DecisionTree(AbstractDecisionTree):
         super().__init__(max_depth, "gini")
         self._subset_size = subset_size
 
-    def _find_threshold(self, data_set, label_set) -> tuple[float, int, int]:
+    def _find_threshold(self, data_set, label_set) -> tuple[criterion, int, float]:
         """
         Finds best threshold to split the dataset.
         The best (feature, threshold) is chosen between a random subset of y.
@@ -32,11 +32,11 @@ class DecisionTree(AbstractDecisionTree):
                 np.add(l_x, e)
                 r_x = r_x[i + 1:]
                 new_gini = calculate_mean_criterion(l_y, r_y, self.compute_criterion)
-                if new_gini < best_gini:
-                    best_gini = new_gini
+                if new_gini < best_criterion:
+                    best_criterion = new_gini
                     res_f, res_t = f, r_x[0][f]
 
-        return best_gini, res_f, res_t
+        return best_criterion, res_f, res_t
 
     def compute_criterion(self, label_set: np.ndarray) -> float:
         """
