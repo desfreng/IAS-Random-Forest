@@ -1,17 +1,16 @@
 import numpy as np
-from graphviz import Digraph
 
 from ..AbstractDecisionTree import AbstractDecisionTree
-from ..utils import calculate_mean_criterion, shrunk_proba_vector
+from ..utils import calculate_mean_criterion
 
 
 class NaiveDecisionTree(AbstractDecisionTree):
-    def __init__(self, max_depth=np.inf):
-        super().__init__(max_depth, "gini")
+    def __init__(self, max_depth=np.inf, criterion_name: str = "gini"):
+        super().__init__(max_depth, criterion_name)
 
     def _find_threshold(self, data_set, label_set) -> tuple[float, int, int]:
         """ Finds best threshold to split the dataset. """
-        best_gini = None
+        best_criterion = None
         best_feature = None
         best_threshold = None
 
@@ -22,20 +21,17 @@ class NaiveDecisionTree(AbstractDecisionTree):
                 left_indexes = np.argwhere(feature_data <= threshold)
                 right_indexes = np.argwhere(feature_data > threshold)
 
-                gini = calculate_mean_criterion(label_set[left_indexes], label_set[right_indexes],
-                                                self.compute_criterion)
-                if best_gini is None or gini < best_gini:
-                    best_gini = gini
+                current_criterion = calculate_mean_criterion(label_set[left_indexes],
+                                                             label_set[right_indexes],
+                                                             self.compute_criterion)
+                if (best_criterion is None or current_criterion < best_criterion) \
+                        and len(left_indexes) > 0 \
+                        and len(right_indexes) > 0:
+                    best_criterion = current_criterion
                     best_feature = feature
                     best_threshold = threshold
 
-        return best_gini, best_feature, best_threshold
+            if best_criterion is None:
+                return self._find_threshold(data_set, label_set)
 
-    def compute_criterion(self, label_set: np.ndarray) -> float:
-        """
-        calculate gini index from array of class labels
-        """
-        return 1 - np.sum(shrunk_proba_vector(label_list=label_set) ** 2)
-
-    def show(self, features_names=None, class_name=None) -> Digraph:
-        return self._abstract_show(True, features_names, class_name)
+        return best_criterion, best_feature, best_threshold

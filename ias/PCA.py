@@ -1,18 +1,20 @@
+from typing import Optional, Union
+
 import numpy as np
 
 
 class PCA:
-    def __init__(self, n_composantes: float | int):
+    def __init__(self, n_composantes: Union[float, int]):
         if isinstance(n_composantes, float) and not (0 <= n_composantes <= 1):
             raise ValueError("n_composantes must be in [0; 1]")
 
         self._n_comp = n_composantes
-        self._data_dim: None | int = None
+        self._data_dim: Optional[int] = None
 
         self._fitted = False
 
-        self._transformation_matrix: None | np.ndarray = None
-        self._average_vector: None | np.ndarray = None
+        self._transformation_matrix: Optional[np.ndarray] = None
+        self._average_vector: Optional[np.ndarray] = None
 
     def _check_for_fit(self):
         if not self._fitted:

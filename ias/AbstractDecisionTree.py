@@ -1,14 +1,16 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 import numpy as np
 from graphviz import Digraph
 from numpy import ndarray
 
-from .utils import class_id, criterion, attributes, np_unique_to_proba_vector, proba
+from .utils import attributes, calculate_gini, calculate_log_loss, class_id, criterion, \
+    np_unique_to_proba_vector, proba
 
 
 class AbstractDecisionTree(ABC):
-    def __init__(self, max_depth: int = np.inf, criterion_name: None | str = None):
+    def __init__(self, max_depth: int = np.inf, criterion_name: Optional[str] = None):
         self._max_depth = max_depth
         self._criterion_name = criterion_name
 
@@ -17,8 +19,8 @@ class AbstractDecisionTree(ABC):
         self._nodes = {}
         self._node_id = -1
 
-        self._features_number: None | int = None
-        self._class_number: None | int = None
+        self._features_number: Optional[int] = None
+        self._class_number: Optional[int] = None
 
     @property
     def features_number(self) -> int:
@@ -36,9 +38,13 @@ class AbstractDecisionTree(ABC):
         self._node_id += 1
         return self._node_id
 
-    @abstractmethod
     def compute_criterion(self, label_set: np.ndarray[class_id]) -> criterion:
-        pass
+        if self._criterion_name == "gini":
+            return calculate_gini(label_set)
+        elif self._criterion_name == "log_loss":
+            return calculate_log_loss(label_set)
+        else:
+            raise ValueError("Undefined criterion_name")
 
     @abstractmethod
     def _find_threshold(self, data_set: np.ndarray[attributes], label_set: np.ndarray[class_id]) \
@@ -123,12 +129,7 @@ class AbstractDecisionTree(ABC):
         self._check_for_fit()
         return np.argmax(self.predict_proba(data_to_classify), axis=1)
 
-    @abstractmethod
     def show(self, features_names: list[str] = None, class_name: list[str] = None) -> Digraph:
-        pass
-
-    def _abstract_show(self, show_criterion: bool, features_names: list[str] = None,
-                       class_name: list[str] = None) -> Digraph:
         """ Affiche le Tree (Utilisable dans Jupyter Notebook)"""
         if not self._fitted:
             return Digraph()
@@ -152,9 +153,7 @@ class AbstractDecisionTree(ABC):
                 threshold = np.round(node_data["threshold"], 2)
 
                 node_str = f"{feature_name} ≤ {threshold}\n"
-                if show_criterion:
-                    node_str += f"{self._criterion_name} = {criterion_value}\n"
-
+                node_str += f"{self._criterion_name} = {criterion_value}\n"
                 node_str += f"Samples = {samples}"
                 node_args = splitting_node_args
 
@@ -162,11 +161,7 @@ class AbstractDecisionTree(ABC):
                 proba_vector = node_data["probability_vector"]
                 majority_class = class_name[np.argmax(proba_vector)]
 
-                if show_criterion:
-                    node_str = f"{self._criterion_name} = {criterion_value}\n"
-                else:
-                    node_str = ""
-
+                node_str = f"{self._criterion_name} = {criterion_value}\n"
                 node_str += f"Samples = {samples}\n" \
                             f"Probabilities : {np.round(proba_vector, 2)}\n" \
                             f"Majority Class = {majority_class}"

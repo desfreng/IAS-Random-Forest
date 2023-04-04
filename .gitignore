@@ -196,3 +196,7 @@ Temporary Items
 
 datasets/*
 !datasets/install_datasets.py
+
+test/*
+!test/*.py
+!test/*.ipynb
