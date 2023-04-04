@@ -92,13 +92,24 @@ class AbstractDecisionTree(ABC):
         self.fit_bis(data_set, label_set, self._new_node_id(), self._max_depth)
         self._fitted = True
 
+    def classify(self, data_to_classify, node_id):
+        """
+        Recursively classify a single element passing through nodes.
+        Returns probability array
+        """
+        if not self.nodes[node_id]["is_node"]: # condition d'arret : feuille
+            return self.nodes[node_id]["probability_vector"]
+        else:
+            f, t = self.nodes[node_id]["feature"], self.nodes[node_id]["treshold"]
+            if data_to_classify[f] <= t:
+                return self.classify(data_to_classify, self.nodes[node_id]["left_son_id"])
+            return self.classify(data_to_classify, self.nodes[node_id]["right_son_id"])
+
     def predict_proba(self, data_to_classify: np.ndarray) -> np.ndarray:
         """ Prend des données non labellisées puis renvoi la proba de chaque label """
-        pass
-
-    def predict_bis(self, data_to_classify: np.ndarray, node_id: int) -> np.ndarray:
-        if not self._nodes[node_id]["is_node"]:  # condition d'arrêt : feuille
-            return np.array([])
+        self._check_for_fit()
+        self._vectorized_classifier = np.vectorize(self.classify)
+        return self._vectorized_classifier(data_to_classify)
 
     def predict(self, data_to_classify: np.ndarray) -> np.ndarray:
         """ Prend des données non labellisées puis renvoi les labels estimés """

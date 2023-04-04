@@ -16,7 +16,6 @@ class DecisionTree(AbstractDecisionTree):
         The best (feature, threshold) is chosen between a random subset of y.
         """
         # TODO : Check this method with refactoring...
-        x_copy = np.copy(data_set)
         best_gini = self.compute_criterion(label_set)
 
         if self._subset_size is None:
@@ -24,12 +23,12 @@ class DecisionTree(AbstractDecisionTree):
         else:
             bag = subset_bagging(self._subset_size, self.features_number)
 
-        res_f, res_t = bag[0], x_copy[0][bag[0]]
+        res_f, res_t = bag[0], data_set[0][bag[0]]
 
         for f in bag:  # on itère sur les features d'un random subset
-            l_x, r_x = np.empty(data_set.shape), x_copy[x_copy[:, f].argsort()]
-            l_y, r_y = np.empty(label_set.shape), label_set[x_copy[:, f].argsort()]
-            for i, e in enumerate(x_copy):
+            l_x, r_x = np.empty(data_set.shape), data_set[data_set[:, f].argsort()]
+            l_y, r_y = np.empty(label_set.shape), label_set[data_set[:, f].argsort()]
+            for i, e in enumerate(data_set):
                 np.add(l_x, e)
                 r_x = r_x[i + 1:]
                 new_gini = calculate_mean_criterion(l_y, r_y, self.compute_criterion)
