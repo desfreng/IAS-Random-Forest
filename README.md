@@ -23,13 +23,15 @@ qui permet l'observation et l'exportation des beaux arbres créés !
 
 PCA, pourquoi, les avantages et inconvénients, description du travail (options etc...)
 
-Decision Tree, pourquoi, les avantages et inconvénients, description du travail (options etc...)
+- Decision Tree
+L'algorithme de random forest se base sur celui-là. Le Decision Tree, est une méthode d'apprentissage pour la classification et la régression. Ici nous avons que traité le cas de la classification. Le concept est simple: c'est un arbre binaire avec à chaque noeud un seuil correspondant à une feature. Ce seuil permet de discriminer les éléments qui se séparent alors. Aux feuilles, on retrouve donc des données classées avec une probabilité par classe. Pour prédire il suffit alors de regarder dans quelle feuille tompe l'élément, et puis de prendre la probabilité la plus haute. Le Decision Tree est donc simple à comprendre (on comprend exactement le raisonnement derrière chaque classification), à visualiser et demande peu de pré-traitement pour les données. Il est en plus rapide pour prédire, une qualité lorsque l'objectif du projet est d'en créer toute une forêt ! Mais cette méthode a aussi des inconvénients, comme une tendance accrue à overfitter. Cela dépend aussi de la condition d'arrêt lors de la création d'arbre: mettre une profondeur limite peut changer la donne. L'implémentation naïve est aussi assez instable dans le sens où des petits changement de training set peuvent générer des arbres totalement différents. Mais ces problèmes sont atténués lorsqu'on utilise l'approche Random Forest, en multipliant les arbres, on évite les cas limites. Dans notre implémentation, nous sommes allés plus loin que la version naïve du Decision Tree. Nous avons implémenté l'algorithme CART ainsi que du Bagging pour les features. En effet, à chaque noeud pour trouver le seuil discriminant, on ne va s'intéresser qu'à un sous ensemble des features, tiré avec remise. Cette création artificielle de biais permet de réduire la variance ainsi que de réduire la compléxité. Pour trouver le meilleur seuil, il faut une mesure de la qualité de la séparation et nous en avons implémenté deux: le Gini criterion ainsi que le Log-loss criterion. Dans la partie test, on compare les deux solutions. Enfin, nous avons travaillé sur la construction de Random Decision Tree dont les seuils de discrimination sont tirés au hasard. Cette algorithme sert pour le "Extremely Randomized Forest" qu'on aborde juste en bas.
 
 Random Forest, les avantages et inconvénients, description du travail (options etc...)
 
 ## L'heure des tests sur des vrais datasets !
 
 ## Nos conclusions sur notre travail et des pistes futures :
+- Pre-pruning et pruning (si on ne le fait pas)
 
 ## Ressources (on garde ?)
 
@@ -39,3 +41,4 @@ Nous nous sommes basé sur la structure de sklearn et leur doc nous a grandement
  - https://towardsmachinelearning.org/decision-tree-algorithm/
  - https://www.ibm.com/topics/decision-trees
  - https://medium.com/geekculture/decision-trees-with-cart-algorithm-7e179acee8ff
+ - https://medium.com/@pralhad2481/chapter-3-decision-tree-learning-part-2-issues-in-decision-tree-learning-babdfdf15ec3
