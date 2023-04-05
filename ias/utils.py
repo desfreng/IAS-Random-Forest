@@ -5,7 +5,6 @@ import numpy as np
 attributes = NewType("Array of attributes", np.ndarray[float])
 proba = NewType("Probability", float)
 class_id = NewType("Id of Classes", int)
-criterion = NewType("Criterion Type", float)
 
 
 def shrunk_proba_vector(label_list: np.ndarray) -> np.ndarray:
@@ -21,7 +20,7 @@ def np_unique_to_proba_vector(np_unique_return, number_of_class: int) -> np.ndar
 
     for i, cls_id in enumerate(class_list):
         proba_vector[int(cls_id)] = class_distribution[i]
-
+        
     return proba_vector / np.sum(class_distribution)
 
 

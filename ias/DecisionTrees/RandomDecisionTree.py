@@ -3,7 +3,7 @@ from typing import Optional
 import numpy as np
 
 from ..AbstractDecisionTree import AbstractDecisionTree
-from ..utils import calculate_mean_criterion, criterion, random, subset_bagging
+from ..utils import calculate_mean_criterion, random, subset_bagging
 
 
 class RandomDecisionTree(AbstractDecisionTree):
@@ -16,7 +16,7 @@ class RandomDecisionTree(AbstractDecisionTree):
     def _threshold_array(attr_bag):
         return random(np.min(attr_bag), np.max(attr_bag))
 
-    def _find_threshold(self, data_set, label_set) -> tuple[criterion, int, float]:
+    def _find_threshold(self, data_set, label_set) -> tuple[float, int, float]:
         """
         Chooses best threshold to split the dataset between random threshold for each feature.
         Random subspaces is applied to y.

@@ -3,7 +3,7 @@ from typing import Optional
 import numpy as np
 
 from ..AbstractDecisionTree import AbstractDecisionTree
-from ..utils import calculate_mean_criterion, criterion, subset_bagging
+from ..utils import calculate_mean_criterion, subset_bagging
 
 
 class CartDecisionTree(AbstractDecisionTree):
@@ -12,7 +12,7 @@ class CartDecisionTree(AbstractDecisionTree):
         super().__init__(max_depth, criterion_name)
         self._subset_size = subset_size
 
-    def _find_threshold(self, data_set, label_set) -> tuple[criterion, int, float]:
+    def _find_threshold(self, data_set, label_set) -> tuple[float, int, float]:
         """
         Finds best threshold to split the dataset.
         The best (feature, threshold) is chosen between a random subset of y.

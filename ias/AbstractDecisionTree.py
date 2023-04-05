@@ -5,7 +5,7 @@ import numpy as np
 from graphviz import Digraph
 from numpy import ndarray
 
-from .utils import attributes, calculate_gini, calculate_log_loss, class_id, criterion, \
+from .utils import attributes, calculate_gini, calculate_log_loss, class_id, \
     np_unique_to_proba_vector, proba
 
 
@@ -38,7 +38,7 @@ class AbstractDecisionTree(ABC):
         self._node_id += 1
         return self._node_id
 
-    def compute_criterion(self, label_set: np.ndarray[class_id]) -> criterion:
+    def compute_criterion(self, label_set: np.ndarray[class_id]) -> float:
         if self._criterion_name == "gini":
             return calculate_gini(label_set)
         elif self._criterion_name == "log_loss":
@@ -48,7 +48,7 @@ class AbstractDecisionTree(ABC):
 
     @abstractmethod
     def _find_threshold(self, data_set: np.ndarray[attributes], label_set: np.ndarray[class_id]) \
-            -> tuple[criterion, int, float]:
+            -> tuple[float, int, float]:
         """ Find the best feature and threshold to cut `data_set` in two non-empty parts.
 
         :param data_set: Array of Features

@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 
 from ias import NaiveDecisionTree, PCA
@@ -31,9 +33,12 @@ compressed_train_x = pca.compress(train_x)
 compressed_test_x = pca.compress(test_x)
 
 print("Tree Fit")
-tree = NaiveDecisionTree(max_depth=10)
+tree = NaiveDecisionTree(max_depth=10, threshold_sub_sampling=2)
+
+time_1 = time.time_ns()
 tree.fit(compressed_train_x, train_y)
 
+# print((time.time_ns() - time_1) * 10e-9)
 print("Results")
 fig, ax = show_confusion_matrix(confusion_matrix(Emnist.class_number, test_y,
                                                  tree.predict(compressed_test_x)),
