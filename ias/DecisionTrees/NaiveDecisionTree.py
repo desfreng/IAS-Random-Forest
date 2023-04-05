@@ -31,7 +31,7 @@ class NaiveDecisionTree(AbstractDecisionTree):
                     best_feature = feature
                     best_threshold = threshold
 
-            if best_criterion is None:
-                return self._find_threshold(data_set, label_set)
+        if best_criterion is None:
+            return self._find_threshold(data_set, label_set)
 
         return best_criterion, best_feature, best_threshold

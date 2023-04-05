@@ -4,19 +4,22 @@ from ias import NaiveDecisionTree, PCA
 from ias.Datasets import Emnist
 from ias.Metrics import accuracy_score, confusion_matrix, show_confusion_matrix
 
+x = Emnist.attributes
+y = Emnist.labels
+
 print("Start")
-indices = np.arange(len(Emnist.attributes))
+indices = np.arange(len(x))
 np.random.shuffle(indices)
-train_size = 1000
-test_size = 1000
+train_size = 2000
+test_size = 3000
 
 train_i = indices[:train_size]
-train_x = Emnist.attributes[train_i]
-train_y = Emnist.labels[train_i]
+train_x = x[train_i]
+train_y = y[train_i]
 
 test_i = indices[train_size:]
-test_x = Emnist.attributes[test_i]
-test_y = Emnist.labels[test_i]
+test_x = x[test_i]
+test_y = y[test_i]
 
 print("PCA")
 

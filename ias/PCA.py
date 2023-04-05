@@ -26,11 +26,11 @@ class PCA:
         nb_data_points = len(data)
 
         data_average = data.sum(axis=0) / nb_data_points
-        cov_matrix = np.zeros((nb_features, nb_features))
 
-        for data_point in range(nb_data_points):
-            centered_data_vector = data[data_point] - data_average
-            cov_matrix += centered_data_vector[np.newaxis].T @ centered_data_vector[np.newaxis]
+        centered_data_matrix = np.reshape(data - data_average, (nb_data_points, nb_features, 1))
+        centered_data_matrix_t = np.reshape(data - data_average, (nb_data_points, 1, nb_features))
+
+        cov_matrix = np.einsum('nij,njk->ik', centered_data_matrix, centered_data_matrix_t)
 
         return cov_matrix / nb_data_points, data_average
 
@@ -59,13 +59,11 @@ class PCA:
 
     def compress(self, input_data: np.ndarray) -> np.ndarray:
         self._check_for_fit()
-        return np.array([(vector - self._average_vector) @ self._transformation_matrix
-                         for vector in input_data])
+        return np.matmul(input_data - self._average_vector, self._transformation_matrix)
 
     def decompress(self, compressed_data: np.ndarray) -> np.ndarray:
         self._check_for_fit()
-        return np.array([(vector @ self._transformation_matrix.T) + self._average_vector
-                         for vector in compressed_data])
+        return np.matmul(compressed_data, self._transformation_matrix.T) + self._average_vector
 
     @property
     def output_dimension(self):

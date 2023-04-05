@@ -36,9 +36,9 @@ def install_iris():
     data = np.genfromtxt(downloaded_file, delimiter=",")
     features_data, label = data[:, :-1], data[:, -1]
 
-    np.savez_compressed(_iris_file, labels=label, attributes=features_data,
-                        class_number=nb_class, class_name=class_mapping,
-                        features_name=features_mapping)
+    np.savez(_iris_file, labels=label, attributes=features_data,
+             class_number=nb_class, class_name=class_mapping,
+             features_name=features_mapping)
     print("Done.")
 
 
@@ -67,9 +67,9 @@ def install_emnist():
     nb_class = 10  # Number of class
     nb_features = len(train_img[0])
 
-    np.savez_compressed(_emnist_file, labels=train_label, attributes=train_img,
-                        class_number=nb_class, class_name=list(map(str, range(nb_class))),
-                        features_name=list(map(str, range(nb_features))))
+    np.savez(_emnist_file, labels=train_label, attributes=train_img,
+             class_number=nb_class, class_name=list(map(str, range(nb_class))),
+             features_name=list(map(str, range(nb_features))))
     print("Done.")
 
 
