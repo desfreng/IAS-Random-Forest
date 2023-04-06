@@ -4,12 +4,12 @@ Ce projet présente une implémentation personnalisée de l'algorithme de classi
 
 ## Table des matières
 
-1. [Prétraitement des données avec PCA](#pca)
-2. [Decision Tree Classifier](#decision-tree)
-3. [Bagging](#bagging)
-4. [Random Forest Classifier](#random-forest)
-5. [Random Splitter](#random-splitter)
-6. [Pruning](#pruning)
+1. [Prétraitement des données avec PCA](#1-prétraitement-des-données-avec-pca)
+2. [Decision Tree Classifier](#2-decision-tree-classifier)
+3. [Bagging](#3-bagging)
+4. [Random Forest Classifier](#4-random-forest-classifier)
+5. [Random Splitter](#5-random-splitter)
+6. [Pruning](#6-pruning)
 
 ### 1. Prétraitement des données avec PCA
 
@@ -45,4 +45,4 @@ Notebook Jupyter: [docs/RandomSplitter.ipynb](docs/RandomSplitter.ipynb)
 
 Enfin, nous abordons l'élagage des arbres de décision (pruning), c'était plus compliqué que prévu donc nous n'avons pas d'implémentation utilisable.
 
-Fichier Markdown: [docs/Prunning.md](docs/Prunning.md)
+Fichier Markdown: [docs/Pruning.md](docs/Pruning.md)
