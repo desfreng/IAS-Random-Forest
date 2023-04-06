@@ -9,7 +9,7 @@ Il fallait, pour pouvoir tester notre travail sur de vrais dataset, être capabl
 Nous avons alors implémenté la PCA, avec chacune de ces étapes (à détailler Gaby).
 Ensuite vient le cœur du programme, le Random Forest Classifier.
 L'algorithme se base sur le Decision Tree Classifier, avec quelques variantes.
-Nous avons donc implémenté l'algorithme CART ainsi qu'une version naïve pour pouvoir les comparer.
+Nous avons donc implémenté l'algorithme CART avec ou sans bagging pour pouvoir les comparer.
 Nous avons voulu aller plus loin en implémentant l'algorithme "Extremely Randomized Tree"
 qui nécessite l'implémentation d'une version modifiée du Decision Tree Classifier.
 Enfin, pour pouvoir comparer et tester nos algorithmes (entre eux ainsi que face aux versions de sklearn)
@@ -19,7 +19,7 @@ qui permet l'observation et l'exportation des beaux arbres créés !
 
 (petit paragraphe sur la structure du code ?)
 
-## Les algorithmes que nous avons implémentés :
+## Les algorithmes que nous avons implémenté :
 
 - PCA, pourquoi, les avantages et inconvénients, description du travail (options etc...)
 
@@ -35,8 +35,8 @@ lorsque l'objectif du projet est d'en créer toute une forêt ! Mais cette méth
 overfitter. Cela dépend aussi de la condition d'arrêt lors de la création d'arbre: mettre une profondeur limite peut changer la donne.
 L'implémentation naïve est aussi assez instable dans le sens où des petits changement de training set peuvent générer des arbres
 totalement différents. Mais ces problèmes sont atténués lorsqu'on utilise l'approche Random Forest, en multipliant les arbres, on évite
-les cas limites. Dans notre implémentation, nous sommes allés plus loin que la version naïve du Decision Tree. Nous avons implémenté
-l'algorithme CART ainsi que du Bagging pour les features. En effet, à chaque noeud pour trouver le seuil discriminant, on ne va
+les cas limites. Dans notre implémentation de l'algorithme CART, nous avons ajouté la possibilité de faire du Bagging pour les features.
+En effet, à chaque noeud pour trouver le seuil discriminant, on ne va
 s'intéresser qu'à un sous ensemble des features, tiré avec remise. Cette création artificielle de biais permet de réduire la variance ainsi
 que de réduire la compléxité. Pour trouver le meilleur seuil, il faut une mesure de la qualité de la séparation et nous en avons
 implémenté deux: le Gini criterion ainsi que le Log-loss criterion. Dans la partie test, on compare les deux solutions.
