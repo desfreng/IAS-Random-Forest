@@ -36,7 +36,7 @@ def install_iris():
     nb_class = 3  # Number of class
 
     data = np.genfromtxt(downloaded_file, delimiter=",")
-    features_data, label = data[:, :-1], data[:, -1]
+    features_data, label = data[:, :-1], data[:, -1].astype(int)
 
     np.savez(_iris_file, labels=label, attributes=features_data,
              class_number=nb_class, class_name=class_mapping,
