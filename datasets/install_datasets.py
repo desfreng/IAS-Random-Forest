@@ -9,8 +9,10 @@ from scipy.io import loadmat
 EMNIST_URL = "https://www.itl.nist.gov/iaui/vip/cs_links/EMNIST/matlab.zip"
 IRIS_URL = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
 
-_emnist_file = Path("./emnist.npz")
-_iris_file = Path("./iris.npz")
+_file_dir = Path(__file__).parent
+
+_emnist_file = _file_dir / "emnist.npz"
+_iris_file = _file_dir / "iris.npz"
 
 
 def install_iris():
