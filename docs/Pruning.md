@@ -1,3 +1,14 @@
+# Pistes d'amélioration
+
+Une piste d'amélioration que nous avons exploré sans pour autant la mettre dans le projet final est le pruning. Le pruning est l'action de
+réduire la taille des arbres en enlevant les noeuds inutiles. Il existe du pre-pruning, qui survient pendant la création même de l'arbre.
+Mais nous avons implémenté le plus simple, le post-pruning. On agit donc après avoir fit l'arbre, avec un algorithme simple de bottom-
+up. Contrairement au up-bottom, on évite de supprimer des branches entières de l'arbre.
+
+Voici une implémentation naïve de à quoi pourrait ressembler le pruning. On ne l'a pas utilisée car
+elle est bien trop couteuse en opérations, puisqu'elle demande avant de supprimer un noeud une
+comparaison entre l'arbre avant et après modification.
+
 ```python
 import numpy as np
 
