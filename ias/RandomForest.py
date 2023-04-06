@@ -1,20 +1,17 @@
-from typing import Type
-
 import numpy as np
 from numpy import ndarray
 
-from .AbstractDecisionTree import AbstractDecisionTree
+from . import DecisionTree
 from .utils import attributes, class_id, proba
 
 
 class RandomForest:
-    def __init__(self, tree_class: Type[AbstractDecisionTree], tree_number: int,
-                 subset_size: int, **args):
-        self._subset_size = subset_size
+    def __init__(self, tree_number: int, training_subset_size: int, **args):
+        self._training_subset_size = training_subset_size
         self._trees = []
 
         for _ in range(tree_number):
-            self._trees.append(tree_class(**args))
+            self._trees.append(DecisionTree(**args))
 
         self._fitted = False
 
@@ -27,7 +24,7 @@ class RandomForest:
         indices = np.arange(len(data_set))
 
         for tree in self._trees:
-            subset_indices = np.random.choice(indices, size=self._subset_size, replace=True)
+            subset_indices = np.random.choice(indices, size=self._training_subset_size)
             tree.fit(data_set[subset_indices], label_set[subset_indices])
 
         self._fitted = True
@@ -47,6 +44,6 @@ class RandomForest:
                 proba_sum = tree.predict_proba(data_to_classify)
             else:
                 proba_sum += tree.predict_proba(data_to_classify)
-                
+
         proba_sum /= len(self._trees)
         return proba_sum

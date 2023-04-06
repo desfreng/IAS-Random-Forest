@@ -1,16 +1,23 @@
-from abc import ABC, abstractmethod
 from typing import Optional
 
 import numpy as np
 from graphviz import Digraph
-from numpy import ndarray
+from numpy import random as rd
 
-from .utils import attributes, calculate_gini, calculate_log_loss, class_id, \
-    np_unique_to_proba_vector, proba, compute_tree_score, create_leaf_from_class, acceptable
+from .utils import attributes, calculate_gini, calculate_log_loss, calculate_mean_criterion, \
+    class_id, is_label_set_pure, np_unique_to_proba_vector, proba
 
 
-class AbstractDecisionTree(ABC):
-    def __init__(self, max_depth: int = np.inf, criterion_name: Optional[str] = None):
+class DecisionTree:
+    def __init__(self, max_depth=np.inf,
+                 splitter: str = "best",
+                 criterion_name: str = "gini",
+                 do_bagging: bool = False,
+                 subset_size: Optional[int] = None):
+        self._splitter = splitter
+        self._subset_size = subset_size
+        self._bagging = do_bagging
+
         self._max_depth = max_depth
         self._criterion_name = criterion_name
 
@@ -22,48 +29,77 @@ class AbstractDecisionTree(ABC):
         self._features_number: Optional[int] = None
         self._class_number: Optional[int] = None
 
-    @property
-    def features_number(self) -> int:
-        return self._features_number
-
-    @property
-    def class_number(self) -> int:
-        return self._class_number
-
     def _check_for_fit(self) -> None:
         if not self._fitted:
-            raise RuntimeError("RandomForest must be fitted")
+            raise RuntimeError("DecisionTree must be fitted")
 
     def _new_node_id(self) -> int:
         self._node_id += 1
         return self._node_id
 
-    def compute_criterion(self, label_set: np.ndarray[class_id]) -> float:
+    def _pick_thresholds(self, attributes_data: np.ndarray[float]) -> np.ndarray[float]:
+        if self._splitter == "best":
+            return attributes_data
+        elif self._splitter == "random":
+            return np.random.uniform(np.min(attributes_data), np.max(attributes_data), 1)
+        else:
+            raise ValueError("Only 'best' and 'random' are supported splitter")
+
+    def _select_features(self) -> np.ndarray[int]:
+        if self._bagging:
+            if self._subset_size is None:
+                self._subset_size = int(np.sqrt(self._features_number))
+
+            return rd.randint(low=0, high=self._features_number, size=self._subset_size)
+        else:
+            return np.arange(self._features_number)
+
+    def _compute_criterion(self, label_set: np.ndarray[class_id]) -> float:
         if self._criterion_name == "gini":
             return calculate_gini(label_set)
         elif self._criterion_name == "log_loss":
             return calculate_log_loss(label_set)
         else:
-            raise ValueError("Undefined criterion_name")
+            raise ValueError("Only 'gini' and 'log_loss' are supported criterion")
 
-    @abstractmethod
-    def _find_threshold(self, data_set: np.ndarray[attributes], label_set: np.ndarray[class_id]) \
-            -> tuple[float, int, float]:
-        """ Find the best feature and threshold to cut `data_set` in two non-empty parts.
-
-        :param data_set: Array of Features
-        :param label_set:
-        :return: a tuple with criterion, the feature's id and the threshold value
+    def _find_threshold(self, data_set, label_set) -> tuple[float, int, float]:
         """
-        pass
+        Finds best threshold to split the dataset.
+        The best (feature, threshold) is chosen between a random subset of y.
+        :param data_set: the dataset
+        :param label_set: the label_set
+        :return: tuple containing (the best criterion value, feature number, threshold value)
+        """
+        best_criterion = None
+        best_feature = None
+        best_threshold = None
 
-    @staticmethod
-    def _is_label_set_pure(label_set: np.ndarray[class_id]) -> bool:
-        return len(np.unique(label_set)) == 1
+        for feature_id in self._select_features():
+            attributes_data = data_set[:, feature_id].flatten()
+
+            for threshold in self._pick_thresholds(attributes_data):
+                left_indexes = np.argwhere(attributes_data <= threshold)
+                right_indexes = np.argwhere(attributes_data > threshold)
+
+                current_criterion = calculate_mean_criterion(label_set[left_indexes],
+                                                             label_set[right_indexes],
+                                                             self._compute_criterion)
+
+                if (best_criterion is None or current_criterion < best_criterion) \
+                        and len(left_indexes) > 0 \
+                        and len(right_indexes) > 0:
+                    best_criterion = current_criterion
+                    best_feature = feature_id
+                    best_threshold = threshold
+
+        if best_criterion is None:
+            return self._find_threshold(data_set, label_set)
+
+        return best_criterion, best_feature, best_threshold
 
     def _fit_bis(self, data_set: np.ndarray[attributes], label_set: np.ndarray[class_id],
                  current_node_id: int, remaining_depth: int) -> None:
-        if (remaining_depth == 1) or (self._is_label_set_pure(label_set)):
+        if (remaining_depth == 1) or (is_label_set_pure(label_set)):
             # le nœud est une feuille
             probability_vector = np_unique_to_proba_vector(np.unique(label_set, return_counts=True),
                                                            self._class_number)
@@ -72,7 +108,7 @@ class AbstractDecisionTree(ABC):
                 "is_node": False,
                 "probability_vector": probability_vector,
                 "samples": len(label_set),
-                "criterion": self.compute_criterion(label_set)
+                "criterion": self._compute_criterion(label_set)
             }
         else:
             criterion_value, selected_feature, threshold = self._find_threshold(data_set, label_set)
@@ -124,7 +160,7 @@ class AbstractDecisionTree(ABC):
         self._check_for_fit()
         return np.apply_along_axis(self._classify, 1, data_to_classify, 0)
 
-    def predict(self, data_to_classify: np.ndarray[attributes]) -> ndarray[int]:
+    def predict(self, data_to_classify: np.ndarray[attributes]) -> np.ndarray[int]:
         """ Prend des données non labellisées puis renvoi les labels estimés """
         self._check_for_fit()
         return np.argmax(self.predict_proba(data_to_classify), axis=1)
@@ -176,41 +212,3 @@ class AbstractDecisionTree(ABC):
                 dot_tree.edges([(str(node_id), str(left_son)), (str(node_id), str(right_son))])
 
         return dot_tree
-    
-    def prune(self, node):
-        """Remove inefficient nodes, simplifying the tree"""
-        if not self._nodes[node]["is_node"]:
-            return True
-        left_son_id = self._nodes[node]["left_son_id"]
-        right_son_id = self._nodes[node]["right_son_id"]
-        pruned_left = self.prune(left_son_id)
-        if pruned_left:
-            pruned_right = self.prune(right_son_id)
-            if pruned_right:
-                # on prune le noeud actuel
-                cls, samples = self.compute_pruned_class(left_son_id, right_son_id)
-                new_leaf = create_leaf_from_class(cls, samples, self._class_number)
-                current_score = compute_tree_score(self._nodes)
-                new_tree = self._nodes.copy()
-                new_tree.pop(left_son_id)
-                new_tree.pop(right_son_id)
-                new_tree.pop(node)
-                new_tree[node] = new_leaf
-                new_score = compute_tree_score(new_tree)
-                if acceptable(new_score, current_score):
-                    self._nodes = new_tree
-                    return True
-                else:
-                    return False
-        else:
-            _ = self.prune(right_son_id)
-            return False
-    
-    def compute_pruned_class(self, left_son_id, right_son_id):
-        """ Compute the more probable class for pruning
-            Returns the most probable class ; number of samples
-        """
-        left_samples, left_p_vector = self._nodes[left_son_id]["samples"], self._nodes[left_son_id]["probability_vector"]
-        right_samples, right_p_vector = self._nodes[right_son_id]["samples"], self._nodes[right_son_id]["probability_vector"]
-        total_d_vector = left_samples * left_p_vector + right_samples * right_p_vector
-        return np.argmax(total_d_vector), np.sum(total_d_vector)
