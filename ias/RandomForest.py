@@ -6,12 +6,12 @@ from .utils import attributes, class_id, proba
 
 
 class RandomForest:
-    def __init__(self, tree_number: int, training_subset_size: int, **args):
+    def __init__(self, tree_number: int, training_subset_size: int, *args, **kwargs):
         self._training_subset_size = training_subset_size
         self._trees = []
 
         for _ in range(tree_number):
-            self._trees.append(DecisionTree(**args))
+            self._trees.append(DecisionTree(*args, **kwargs))
 
         self._fitted = False
 
