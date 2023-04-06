@@ -1,73 +1,48 @@
-# Rapport IAS-Random-Forest
+# Projet IAS-Random-Forest
 
-## Sur quoi nous avons travaillé :
+Ce projet présente une implémentation personnalisée de l'algorithme de classification Random Forest, incluant plusieurs variantes et techniques de prétraitement des données. Le code est disponible sous la forme de notebooks Jupyter et de fichiers Markdown pour faciliter l'expérimentation et la compréhension des différentes étapes.
 
-Nous avons travaillé sur une implémentation de l'algorithme de classification Random Forest.
-Notre travail met en œuvre chacune des étapes de la classification.
-En effet, une première partie de notre travail porte sur le prétraitement des données.
-Il fallait, pour pouvoir tester notre travail sur de vrais dataset, être capable de réduire en dimension les attributs.
-Nous avons alors implémenté la PCA, avec chacune de ces étapes (à détailler Gaby).
-Ensuite vient le cœur du programme, le Random Forest Classifier.
-L'algorithme se base sur le Decision Tree Classifier, avec quelques variantes.
-Nous avons donc implémenté l'algorithme CART avec ou sans bagging pour pouvoir les comparer.
-Nous avons voulu aller plus loin en implémentant l'algorithme "Extremely Randomized Tree"
-qui nécessite l'implémentation d'une version modifiée du Decision Tree Classifier.
-Enfin, pour pouvoir comparer et tester nos algorithmes (entre eux ainsi que face aux versions de sklearn)
-nous avons utilisé les dataset "Iris" et "eMNIST".
-Pour pouvoir mieux visualiser les résultats, nous avons aussi travaillé sur un module de graphes
-qui permet l'observation et l'exportation des beaux arbres créés !
+## Table des matières
 
-(petit paragraphe sur la structure du code ?)
+1. [Prétraitement des données avec PCA](#pca)
+2. [Decision Tree Classifier](#decision-tree)
+3. [Bagging](#bagging)
+4. [Random Forest Classifier](#random-forest)
+5. [Random Splitter](#random-splitter)
+6. [Pruning](#pruning)
 
-## Les algorithmes que nous avons implémenté :
+### 1. Prétraitement des données avec PCA
 
-- PCA, pourquoi, les avantages et inconvénients, description du travail (options etc...)
+Dans cette partie, nous abordons la réduction de dimensionnalité des attributs en utilisant la méthode PCA (Principal Component Analysis). Cela permet d'améliorer les performances de l'algorithme en réduisant le nombre de dimensions à traiter.
 
-- Decision Tree
+Notebook Jupyter: [docs/PCA.ipynb](docs/PCA.ipynb)
 
-L'algorithme de random forest se base sur celui-là. Le Decision Tree, est une méthode d'apprentissage pour la classification et la
-régression. Ici nous avons que traité le cas de la classification. Le concept est simple: c'est un arbre binaire avec à chaque noeud
-un seuil correspondant à une feature. Ce seuil permet de discriminer les éléments qui se séparent alors. Aux feuilles, on retrouve donc des
-données classées avec une probabilité par classe. Pour prédire il suffit alors de regarder dans quelle feuille tompe l'élément, et puis de
-prendre la probabilité la plus haute. Le Decision Tree est donc simple à comprendre (on comprend exactement le raisonnement derrière
-chaque classification), à visualiser et demande peu de pré-traitement pour les données. Il est en plus rapide pour prédire, une qualité
-lorsque l'objectif du projet est d'en créer toute une forêt ! Mais cette méthode a aussi des inconvénients, comme une tendance accrue à
-overfitter. Cela dépend aussi de la condition d'arrêt lors de la création d'arbre: mettre une profondeur limite peut changer la donne.
-L'implémentation naïve est aussi assez instable dans le sens où des petits changement de training set peuvent générer des arbres
-totalement différents. Mais ces problèmes sont atténués lorsqu'on utilise l'approche Random Forest, en multipliant les arbres, on évite
-les cas limites. Dans notre implémentation de l'algorithme CART, nous avons ajouté la possibilité de faire du Bagging pour les features.
-En effet, à chaque noeud pour trouver le seuil discriminant, on ne va
-s'intéresser qu'à un sous ensemble des features, tiré avec remise. Cette création artificielle de biais permet de réduire la variance ainsi
-que de réduire la compléxité. Pour trouver le meilleur seuil, il faut une mesure de la qualité de la séparation et nous en avons
-implémenté deux: le Gini criterion ainsi que le Log-loss criterion. Dans la partie test, on compare les deux solutions.
-Enfin, nous avons travaillé sur la construction de Random Decision Tree dont les seuils de discrimination sont tirés au hasard.
-Cette algorithme sert pour le "Extremely Randomized Forest" qu'on aborde juste en bas. Nous nous sommes également intéressés au pruning.
-Le pruning est l'action de réduire la taille des arbres en enlevant les noeuds inutiles. Il existe du pre-pruning, qui survient pendant la création même
-de l'arbre. Mais nous avons implémenté le plus simple, le post-pruning. On agit donc après avoir fit l'arbre, avec un algorithme simple de bottom-up.
-Contrairement au up-bottom, on évite de supprimer des branches entières de l'arbre.
+### 2. Decision Tree Classifier
 
-- Random Forest, les avantages et inconvénients, description du travail (options etc...)
+Ici, nous présentons l'implémentation de l'algorithme CART (Classification and Regression Trees) pour les arbres de décision. Nous discutons également des avantages et inconvénients de cette méthode, ainsi que des critères de sélection des seuils (Gini et Log-loss).
 
-(Description de l'algo et du travail effectué par Thomas )
+Notebook Jupyter: [docs/DecisionTree.ipynb](docs/DecisionTree.ipynb)
 
-La variante "Extremely Randomized Forest" utilise le même code que le Random Forest, la différence est au niveau de la construction
-de l'arbre. Les seuils de séparation pour les noeuds ne sont plus choisis par rapport aux attributs des éléments comme dans CART. On
-choisi le meilleur seuil parmi un ensemble de seuil tiré au hasard, et on en tire peu: un par feature. On réduit énormément le temps de
-calcul, puisque l'opération la plus couteuse est la recherche de ce seuil. De plus, on réduit encore plus la variance. Cette algorithme
-permet donc de créer plus d'arbres avec moins de variance avec comme inconvénient un plus grand biais.
+### 3. Bagging
 
+Dans cette section, nous explorons la technique de Bagging (Bootstrap Aggregating) qui permet de réduire la variance et d'améliorer la performance des arbres de décision en créant plusieurs arbres et en combinant leurs résultats.
 
+Notebook Jupyter: [docs/Bagging.ipynb](docs/Bagging.ipynb)
 
-## L'heure de tester sur des vrais datasets !
+### 4. Random Forest Classifier
 
-## Nos conclusions sur notre travail et des pistes futures :
+Dans cette partie, nous implémentons l'algorithme Random Forest, qui repose sur le Decision Tree Classifier et le comparons à un simple Decision Tree Classifier avec la technique de Bagging.
 
-## Ressources (on garde ?)
+Notebook Jupyter: [docs/RandomForest.ipynb](docs/RandomForest.ipynb)
 
-Nous nous sommes basé sur la structure de sklearn et leur doc nous a grandement aidé.
- - https://scikit-learn.org/stable/modules/tree.html
- - https://en.wikipedia.org/wiki/Decision_tree
- - https://towardsmachinelearning.org/decision-tree-algorithm/
- - https://www.ibm.com/topics/decision-trees
- - https://medium.com/geekculture/decision-trees-with-cart-algorithm-7e179acee8ff
- - https://medium.com/@pralhad2481/chapter-3-decision-tree-learning-part-2-issues-in-decision-tree-learning-babdfdf15ec3
+### 5. Random Splitter
+
+Pour aller plus loin nous présentons ici la variante Random Splitter, qui utilise des seuils de séparation tirés au hasard pour réduire le temps de calcul et la variance. Nous décrivons les différences par rapport à l'algorithme Random Forest et les avantages et inconvénients de cette approche.
+
+Notebook Jupyter: [docs/RandomSplitter.ipynb](docs/RandomSplitter.ipynb)
+
+### 6. Pruning
+
+Enfin, nous abordons l'élagage des arbres de décision (pruning), c'était plus compliqué que prévu donc nous n'avons pas d'implémentation utilisable.
+
+Fichier Markdown: [docs/Prunning.md](docs/Prunning.md)
