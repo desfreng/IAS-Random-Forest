@@ -20,7 +20,7 @@ def np_unique_to_proba_vector(np_unique_return, number_of_class: int) -> np.ndar
 
     for i, cls_id in enumerate(class_list):
         proba_vector[int(cls_id)] = class_distribution[i]
-        
+
     return proba_vector / np.sum(class_distribution)
 
 
@@ -58,14 +58,16 @@ def calculate_log_loss(y):
     proba_vect = shrunk_proba_vector(label_list=y)
     return np.sum(-proba_vect * np.log(proba_vect))
 
+
 # ----------------------------------- PRUNING -----------------------------------#
 
 def compute_tree_score(nodes):
     """ Compute efficiency score from tree """
     return 1
 
+
 def create_leaf_from_class(cls, samples, nb_cls):
-    """ Create leaf dictionnary from """
+    """ Create leaf dictionary from """
     proba_vector = np.zeros(nb_cls)
     proba_vector[cls] = 1
     leaf = {
@@ -75,6 +77,7 @@ def create_leaf_from_class(cls, samples, nb_cls):
         "criterion": 1
     }
     return leaf
+
 
 def acceptable(new_score, old_score):
     """Returns whether new_score is acceptable compared to old_score or not"""

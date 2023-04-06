@@ -178,23 +178,23 @@ class AbstractDecisionTree(ABC):
         return dot_tree
     
     def prune(self, node):
-        """Remove unefficient nodes, simplifying the tree"""
+        """Remove inefficient nodes, simplifying the tree"""
         if not self._nodes[node]["is_node"]:
             return True
         left_son_id = self._nodes[node]["left_son_id"]
         right_son_id = self._nodes[node]["right_son_id"]
         pruned_left = self.prune(left_son_id)
         if pruned_left:
-            pruned_right = self._prune(right_son_id)
+            pruned_right = self.prune(right_son_id)
             if pruned_right:
                 # on prune le noeud actuel
                 cls, samples = self.compute_pruned_class(left_son_id, right_son_id)
-                new_leaf = create_leaf_from_class(cls, samples)
+                new_leaf = create_leaf_from_class(cls, samples, self._class_number)
                 current_score = compute_tree_score(self._nodes)
                 new_tree = self._nodes.copy()
-                new_tree.delete(left_son_id)
-                new_tree.delete(right_son_id)
-                new_tree.delete(node)
+                new_tree.pop(left_son_id)
+                new_tree.pop(right_son_id)
+                new_tree.pop(node)
                 new_tree[node] = new_leaf
                 new_score = compute_tree_score(new_tree)
                 if acceptable(new_score, current_score):
@@ -203,7 +203,7 @@ class AbstractDecisionTree(ABC):
                 else:
                     return False
         else:
-            pruned_right = self._prune(right_son_id)
+            _ = self.prune(right_son_id)
             return False
     
     def compute_pruned_class(self, left_son_id, right_son_id):
