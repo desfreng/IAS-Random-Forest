@@ -6,7 +6,7 @@ from graphviz import Digraph
 from numpy import ndarray
 
 from .utils import attributes, calculate_gini, calculate_log_loss, class_id, \
-    np_unique_to_proba_vector, proba
+    np_unique_to_proba_vector, proba, compute_tree_score, create_leaf_from_class, acceptable
 
 
 class AbstractDecisionTree(ABC):
@@ -176,3 +176,41 @@ class AbstractDecisionTree(ABC):
                 dot_tree.edges([(str(node_id), str(left_son)), (str(node_id), str(right_son))])
 
         return dot_tree
+    
+    def prune(self, node):
+        """Remove unefficient nodes, simplifying the tree"""
+        if not self._nodes[node]["is_node"]:
+            return True
+        left_son_id = self._nodes[node]["left_son_id"]
+        right_son_id = self._nodes[node]["right_son_id"]
+        pruned_left = self.prune(left_son_id)
+        if pruned_left:
+            pruned_right = self._prune(right_son_id)
+            if pruned_right:
+                # on prune le noeud actuel
+                cls, samples = self.compute_pruned_class(left_son_id, right_son_id)
+                new_leaf = create_leaf_from_class(cls, samples)
+                current_score = compute_tree_score(self._nodes)
+                new_tree = self._nodes.copy()
+                new_tree.delete(left_son_id)
+                new_tree.delete(right_son_id)
+                new_tree.delete(node)
+                new_tree[node] = new_leaf
+                new_score = compute_tree_score(new_tree)
+                if acceptable(new_score, current_score):
+                    self._nodes = new_tree
+                    return True
+                else:
+                    return False
+        else:
+            pruned_right = self._prune(right_son_id)
+            return False
+    
+    def compute_pruned_class(self, left_son_id, right_son_id):
+        """ Compute the more probable class for pruning
+            Returns the most probable class ; number of samples
+        """
+        left_samples, left_p_vector = self._nodes[left_son_id]["samples"], self._nodes[left_son_id]["probability_vector"]
+        right_samples, right_p_vector = self._nodes[right_son_id]["samples"], self._nodes[right_son_id]["probability_vector"]
+        total_d_vector = left_samples * left_p_vector + right_samples * right_p_vector
+        return np.argmax(total_d_vector), np.sum(total_d_vector)
