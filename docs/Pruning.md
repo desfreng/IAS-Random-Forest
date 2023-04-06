@@ -2,12 +2,14 @@
 
 Une piste d'amélioration que nous avons exploré sans pour autant la mettre dans le projet final est le pruning. Le pruning est l'action de
 réduire la taille des arbres en enlevant les noeuds inutiles. Il existe du pre-pruning, qui survient pendant la création même de l'arbre.
-Mais nous avons implémenté le plus simple, le post-pruning. On agit donc après avoir fit l'arbre, avec un algorithme simple de bottom-
-up. Contrairement au up-bottom, on évite de supprimer des branches entières de l'arbre.
+Il est alors très efficace et permet vraiment de simplifier la foret sans pour autant perdre d'informations.
+Mais nous avons travaillé sur le plus simple, le post-pruning. On agit donc après avoir fit l'arbre, avec l'algorithme le plus
+simple partant des feuilles. Contrairement aux algorithmes partant de la racine, on évite de supprimer des branches entières de l'arbre.
+Ce qui pourrait supprimer des noeuds utiles alors que leurs parents sont considérés comme inutiles.
 
 Voici une implémentation naïve de à quoi pourrait ressembler le pruning. On ne l'a pas utilisée car
 elle est bien trop couteuse en opérations, puisqu'elle demande avant de supprimer un noeud une
-comparaison entre l'arbre avant et après modification.
+comparaison en efficacité (donc appel à predict) entre l'arbre avant et après modification.
 
 ```python
 import numpy as np
@@ -17,7 +19,7 @@ import numpy as np
 
 def compute_tree_score(nodes):
     """ Compute efficiency score from tree """
-    return 1
+    pass
 
 
 def create_leaf_from_class(cls, samples, nb_cls):
