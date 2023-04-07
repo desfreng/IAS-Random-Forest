@@ -1,8 +1,12 @@
+from copy import deepcopy
 from typing import Optional
 
 import matplotlib.axes
 import matplotlib.pyplot as plt
 import numpy as np
+
+from .DecisionTree import DecisionTree
+from .utils import attributes, class_id
 
 
 def accuracy_score(known_labels: np.ndarray, predicted_labels: np.ndarray) -> float:
@@ -23,7 +27,7 @@ def confusion_matrix(nb_class: int, known_labels: np.ndarray,
     return conf_matrix
 
 
-def compute_luminance(color):
+def _compute_luminance(color):
     def _compute(channel_value):
         if channel_value <= 0.04045:
             return channel_value / 12.92
@@ -34,7 +38,7 @@ def compute_luminance(color):
 
 
 def _compute_best_contrast_color(background_color):
-    color_luminance = compute_luminance(background_color)
+    color_luminance = _compute_luminance(background_color)
 
     luminance_ratio_black_text = (color_luminance + 0.05) / 0.05
     luminance_ratio_white_text = 1.05 / (color_luminance + 0.05)
@@ -93,3 +97,36 @@ def show_confusion_matrix(conf_mat: np.ndarray,
     )
 
     return fig, ax
+
+
+def cross_validation(tree: DecisionTree,
+                     data_set: np.ndarray[attributes],
+                     label_set: np.ndarray[class_id],
+                     fold_number: int) -> np.ndarray[float]:
+    score_vector = np.zeros(fold_number)
+    data_set_size = len(data_set)
+    fold_size = data_set_size // fold_number
+
+    permutation = np.arange(data_set_size)
+    np.random.shuffle(permutation)
+
+    data_set = data_set[permutation]
+    label_set = label_set[permutation]
+
+    for i in range(fold_number):
+        begin_validation_section = i * fold_size
+        end_validation_section = begin_validation_section + fold_size
+
+        validation_data_set = data_set[begin_validation_section:end_validation_section]
+        validation_label_set = label_set[begin_validation_section:end_validation_section]
+
+        train_data_set = np.concatenate(
+            [data_set[:begin_validation_section], data_set[end_validation_section:]])
+        train_label_set = np.concatenate(
+            [label_set[:begin_validation_section], label_set[end_validation_section:]])
+
+        current_tree = deepcopy(tree)
+        current_tree.fit(train_data_set, train_label_set)
+        score_vector[i] = accuracy_score(validation_label_set,
+                                         current_tree.predict(validation_data_set))
+    return score_vector
