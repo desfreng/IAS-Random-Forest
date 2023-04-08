@@ -14,6 +14,15 @@ def accuracy_score(known_labels: np.ndarray, predicted_labels: np.ndarray) -> fl
     return nb_good_pred / len(predicted_labels)
 
 
+def estimate_variance(known_labels: np.ndarray, predicted_labels_train: np.ndarray, predicted_labels_test: np.ndarray) -> float:
+    neg_train = np.count_nonzero(known_labels != predicted_labels_train)
+    neg_test = np.count_nonzero(known_labels != predicted_labels_test)
+    accuracy_train = accuracy_score(known_labels, predicted_labels_train)
+    accuracy_test = accuracy_score(known_labels, predicted_labels_test)
+    epsilon = 1e-7
+    return np.abs(neg_train/(accuracy_train+epsilon) - neg_test/(accuracy_test+epsilon))
+
+
 def confusion_matrix(nb_class: int, known_labels: np.ndarray,
                      predicted_labels: np.ndarray) -> np.ndarray:
     conf_matrix = np.zeros((nb_class, nb_class), dtype=int)
