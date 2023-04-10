@@ -1,10 +1,11 @@
 from copy import deepcopy
-from typing import Optional
+from typing import Optional, Union
 
 import matplotlib.axes
 import matplotlib.pyplot as plt
 import numpy as np
 
+from . import RandomForest
 from .DecisionTree import DecisionTree
 from .utils import attributes, class_id
 
@@ -14,14 +15,15 @@ def accuracy_score(known_labels: np.ndarray, predicted_labels: np.ndarray) -> fl
     return nb_good_pred / len(predicted_labels)
 
 
-def estimate_variance(known_labels: np.ndarray, predicted_labels_train: np.ndarray, predicted_labels_test: np.ndarray) -> float:
+def estimate_variance(known_labels: np.ndarray, predicted_labels_train: np.ndarray,
+                      predicted_labels_test: np.ndarray) -> float:
     accuracy_train = accuracy_score(known_labels, predicted_labels_train)
     accuracy_test = accuracy_score(known_labels, predicted_labels_test)
-    epsilon = 1e-7
     return np.abs(accuracy_train - accuracy_test)
 
+
 def estimate_bias(known_labels: np.ndarray, predicted_train_label: np.ndarray) -> float:
-    return 1 - accuracy_score(known_labels, predicted_labels)
+    return 1 - accuracy_score(known_labels, predicted_train_label)
 
 
 def confusion_matrix(nb_class: int, known_labels: np.ndarray,
@@ -109,7 +111,7 @@ def show_confusion_matrix(conf_mat: np.ndarray,
     return fig, ax
 
 
-def cross_validation(tree: DecisionTree,
+def cross_validation(tree: Union[DecisionTree, RandomForest],
                      data_set: np.ndarray[attributes],
                      label_set: np.ndarray[class_id],
                      fold_number: int) -> np.ndarray[float]:
