@@ -20,8 +20,9 @@ def estimate_variance(known_labels: np.ndarray, predicted_labels_train: np.ndarr
     epsilon = 1e-7
     return np.abs(accuracy_train - accuracy_test)
 
+
 def estimate_bias(known_labels: np.ndarray, predicted_train_label: np.ndarray) -> float:
-    return 1 - accuracy_score(known_labels, predicted_labels)
+    return 1 - accuracy_score(known_labels, predicted_train_label)
 
 
 def confusion_matrix(nb_class: int, known_labels: np.ndarray,
