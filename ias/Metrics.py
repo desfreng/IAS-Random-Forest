@@ -1,12 +1,10 @@
 from copy import deepcopy
-from typing import Optional, Union
+from typing import Optional
 
 import matplotlib.axes
 import matplotlib.pyplot as plt
 import numpy as np
 
-from . import RandomForest
-from .DecisionTree import DecisionTree
 from .utils import attributes, class_id
 
 
@@ -111,7 +109,7 @@ def show_confusion_matrix(conf_mat: np.ndarray,
     return fig, ax
 
 
-def cross_validation(tree: Union[DecisionTree, RandomForest],
+def cross_validation(tree,
                      data_set: np.ndarray[attributes],
                      label_set: np.ndarray[class_id],
                      fold_number: int) -> np.ndarray[float]:

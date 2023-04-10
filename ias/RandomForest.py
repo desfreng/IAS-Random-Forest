@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import ndarray
 
-from . import DecisionTree
+from .DecisionTree import DecisionTree
 from .utils import attributes, class_id, proba
 
 

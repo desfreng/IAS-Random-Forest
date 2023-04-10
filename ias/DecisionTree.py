@@ -13,7 +13,8 @@ class DecisionTree:
                  splitter: str = "best",
                  criterion_name: str = "gini",
                  do_bagging: bool = False,
-                 subset_size: Optional[int] = None):
+                 subset_size: Optional[int] = None,
+                 class_number: Optional[int] = None):
         self._splitter = splitter
         self._subset_size = subset_size
         self._bagging = do_bagging
@@ -27,7 +28,7 @@ class DecisionTree:
         self._node_id = -1
 
         self._features_number: Optional[int] = None
-        self._class_number: Optional[int] = None
+        self._class_number: Optional[int] = class_number
 
     def _check_for_fit(self) -> None:
         if not self._fitted:
@@ -131,10 +132,13 @@ class DecisionTree:
             self._fit_bis(data_set[right_indexes, :], label_set[right_indexes], right_son_id,
                           remaining_depth - 1)
 
-    def fit(self, data_set: np.ndarray[attributes], label_set: np.ndarray[class_id]) -> None:
+    def fit(self, data_set: np.ndarray[attributes],
+            label_set: np.ndarray[class_id]) -> None:
         """ Crée un arbre avec les données labellisées (x, y) """
+
         self._features_number = len(data_set[0])
-        self._class_number = int(np.max(label_set)) + 1
+        if self._class_number is None:
+            self._class_number = int(np.max(label_set)) + 1
 
         assert self._max_depth > 0
 
