@@ -1,5 +1,7 @@
 # Projet IAS-Random-Forest
 
+Projet Réalisé par : Thomas Marchand, Louis Milhaud & Gabriel Desfrene
+
 Ce projet présente une implémentation personnalisée de l'algorithme de classification Random Forest,
 incluant plusieurs variantes et techniques de prétraitement des données. Le code est disponible sous
 la forme de notebooks Jupyter et de fichiers Markdown pour faciliter l'expérimentation et la
@@ -95,3 +97,8 @@ Enfin, nous abordons l'élagage des arbres de décision (pruning), c'était plus
 donc nous n'avons pas d'implémentation utilisable.
 
 Fichier Markdown: [docs/Pruning.md](docs/Pruning.md)
+
+### Notes :
+
+Vu l'implémentation en Python, le code est souvent lent à s'exécuter. _Sklearn_ est bien plus
+rapide principalement grâce à son implémentation en C (Cython pour être précis).
